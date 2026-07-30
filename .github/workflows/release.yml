@@ -76,4 +76,4 @@ jobs:
             --generate-notes \
             --latest \
             --title "Remote Sync ${GITHUB_REF_NAME}" \
-            --notes "Download the archive for your operating system and CPU, then open QUICKSTART_KO.txt or QUICKSTART_EN.txt. The binaries are not code-signed; verify SHA256SUMS.txt before running them."
+            --notes "Download the archive for your operating system and CPU. Open USER_GUIDE_KO.txt or USER_GUIDE_EN.txt for the server/client setup, then use QUICKSTART_KO.txt or QUICKSTART_EN.txt as a checklist. The binaries are not code-signed; verify SHA256SUMS.txt before running them."

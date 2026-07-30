@@ -1,0 +1,326 @@
+REMOTE SYNC USER GUIDE
+======================
+
+This guide explains how to use a GitHub Release archive without building the
+source code.
+
+Choose your role first
+----------------------
+
+Remote Sync has two separate runtime roles:
+
+  Server computer
+    Stores backup history and file data. It normally stays running in one
+    central location.
+
+  Client computer
+    Runs sync-agent for one selected Codex or Claude worktree. Run one agent
+    for each computer that needs backup.
+
+Every release archive contains all three programs:
+
+  sync-agent
+    The client used by normal users.
+
+  sync-server
+    The central service used by a server administrator.
+
+  sync-migrate
+    An administrator tool that prepares or upgrades the server database.
+
+Normal users do not need to start sync-server or sync-migrate.
+
+
+1. Download the correct file
+----------------------------
+
+Open the official release page:
+
+  https://github.com/hawoond/remote-sync/releases/latest
+
+Download one archive for the computer:
+
+  Apple silicon Mac
+    remote-sync_*_darwin_arm64.tar.gz
+
+  Intel Mac
+    remote-sync_*_darwin_amd64.tar.gz
+
+  Standard 64-bit Windows
+    remote-sync_*_windows_amd64.zip
+
+  Windows on ARM
+    remote-sync_*_windows_arm64.zip
+
+  Standard 64-bit Linux
+    remote-sync_*_linux_amd64.tar.gz
+
+  Linux on ARM
+    remote-sync_*_linux_arm64.tar.gz
+
+On a Mac, check Apple menu > About This Mac for Chip or Processor. On Windows,
+check Settings > System > About > System type.
+
+
+2. Verify the download
+----------------------
+
+Download SHA256SUMS.txt from the same release. Open Terminal or PowerShell in
+the download folder and run:
+
+  macOS
+    shasum -a 256 remote-sync_*.tar.gz
+
+  Windows PowerShell
+    Get-FileHash .\remote-sync_*.zip -Algorithm SHA256
+
+  Linux
+    sha256sum remote-sync_*.tar.gz
+
+The long value must match the value next to the same filename in
+SHA256SUMS.txt. If it does not match, do not run the file. Delete it and
+download it again from the official release page.
+
+
+3. Extract the archive
+----------------------
+
+Double-click the downloaded archive. You may move the extracted directory, but
+keep all files together.
+
+Important files:
+
+  QUICKSTART_EN.txt
+    The shortest setup checklist.
+
+  USER_GUIDE_EN.txt
+    This detailed guide.
+
+  remote-sync.env.example
+    The client configuration template.
+
+  Start Remote Sync.command / Start Remote Sync.cmd /
+  start-remote-sync.sh
+    The client launcher for each operating system.
+
+
+4. Get connection details from the server administrator
+-------------------------------------------------------
+
+A normal user needs these values:
+
+  SYNC_SERVER_ADDRESS
+    The server host and port, for example sync.example.com:8443.
+
+  SYNC_DEVICE_TOKEN
+    A secret credential for this computer only.
+
+  SYNC_FOLDER_ID
+    The server folder whose history this client updates.
+
+Do not copy one computer's SYNC_DEVICE_TOKEN to another computer. Every
+computer must be enrolled as a separate device. If a token is exposed, ask the
+server administrator to enroll a replacement device.
+
+
+5. Configure the client
+-----------------------
+
+1) Make a copy of remote-sync.env.example.
+
+2) Rename the copy exactly to remote-sync.env.
+
+3) Open remote-sync.env in a plain-text editor.
+
+4) Enter the three values supplied by the server administrator:
+
+     SYNC_SERVER_ADDRESS=sync.example.com:8443
+     SYNC_DEVICE_TOKEN=your_device_token
+     SYNC_FOLDER_ID=your_folder_id
+
+5) Leave SYNC_WORKTREE empty on the first start:
+
+     SYNC_WORKTREE=
+
+   The program will display discovered Codex and Claude worktrees and require
+   you to choose one. To reuse the same selection later, put its displayed ID
+   or absolute path in SYNC_WORKTREE.
+
+6) Keep the following value false for a normal TLS server:
+
+     ALLOW_INSECURE=false
+
+   Use true only for a trusted local test server and only when instructed by
+   the server administrator.
+
+7) Save the file. It contains a secret token, so do not send it by email,
+   chat, or commit it to a public repository.
+
+
+6. Start the client
+-------------------
+
+macOS
+  Double-click "Start Remote Sync.command".
+
+Windows
+  Double-click "Start Remote Sync.cmd".
+
+Linux
+  Run this command in a terminal:
+
+    ./start-remote-sync.sh
+
+When the numbered list appears, enter the worktree number and press Enter.
+Selection is required even when only one worktree is found.
+
+Remote Sync runs while its terminal window remains open. Press Ctrl+C or close
+the window to stop it. Start the launcher again after restarting the computer.
+
+
+7. Operating-system security warnings
+-------------------------------------
+
+These release binaries are not code-signed or notarized.
+
+If macOS blocks the launcher
+  Verify the SHA-256 value first. In Finder, Control-click
+  "Start Remote Sync.command", choose Open, and choose Open again.
+
+If Windows SmartScreen appears
+  Verify the SHA-256 value first. Choose More info > Run anyway only when the
+  file came from the official release page.
+
+Do not disable the operating system's security features globally.
+
+
+8. If no worktree appears
+-------------------------
+
+Remote Sync automatically lists Git worktrees created by Codex and Claude.
+If the list is empty:
+
+  - Create or open the worktree in Codex or Claude first.
+  - Stop Remote Sync and start it again.
+  - Put the absolute path of the folder you selected in SYNC_WORKTREE inside
+    remote-sync.env.
+  - Confirm that the directory is a real Git worktree.
+
+If the selected worktree is removed or moved, Remote Sync stops safely instead
+of treating the missing root as a mass deletion. Select its new location.
+
+
+9. Restore a backup
+-------------------
+
+Restore into a new, empty directory so restored files do not mix with existing
+files. The default restores the latest server sequence.
+
+macOS Terminal
+  ./"Start Remote Sync.command" restore --target "$HOME/remote-sync-restore"
+
+Windows PowerShell
+  & ".\Start Remote Sync.cmd" restore --target "$HOME\remote-sync-restore"
+
+Linux terminal
+  ./start-remote-sync.sh restore --target "$HOME/remote-sync-restore"
+
+Do not edit files in the target directory until restore completes. If it
+fails, leave the target directory in place and send the displayed error to the
+server administrator. Never include the device token in a screenshot or log.
+
+
+10. Add another computer
+------------------------
+
+Every computer must be enrolled separately. A server administrator can create
+a short-lived, one-time enrollment token from an existing restore-admin
+device. The new computer exchanges it for its own device_token and folder_id.
+
+Normal users should ask the server administrator to "enroll a new device".
+Do not copy an existing remote-sync.env or device token. Exact administrator
+commands are in the README section named "Enroll another device".
+
+
+11. Server administrator notes
+------------------------------
+
+One server can support multiple client computers. It requires PostgreSQL and a
+disk for backup objects.
+
+The simplest setup uses Docker:
+
+1) Install Docker Desktop or Docker Engine.
+
+2) Download and extract the Source code archive from the release page.
+
+3) Open a macOS/Linux terminal or Windows WSL in the source directory.
+
+4) Run the setup and choose a database:
+
+     ./scripts/init-env.sh
+
+   Bundled PostgreSQL is simplest for a first setup. Choose External
+   PostgreSQL only when an existing PostgreSQL service is already managed.
+
+5) Start the server:
+
+     ./scripts/docker-compose.sh
+
+6) Check its status:
+
+     ./scripts/docker-compose.sh ps
+
+The generated .env file contains the initial administrator device and secret
+values. Keep it private. Do not distribute the bootstrap administrator token
+as a normal client credential.
+
+The default Docker setup binds only to 127.0.0.1 and uses
+ALLOW_INSECURE=true for a local test. Before another computer or the internet
+can connect, an administrator must configure TLS, the firewall, and the public
+bind address. Never expose an ALLOW_INSECURE=true server to a public network.
+
+Stop the server:
+
+  ./scripts/docker-compose.sh down
+
+This preserves the database and backup volumes by default. Do not add
+--volumes while stored data is still needed.
+
+
+12. Troubleshooting
+-------------------
+
+"Remote Sync configuration was not found"
+  Confirm that remote-sync.env is in the launcher directory. Make sure the
+  actual filename is not remote-sync.env.txt.
+
+"connection refused", "deadline exceeded", or a timeout
+  Ask the administrator to confirm that the server is running and that the
+  address and port are correct.
+
+"Unauthenticated" or "PermissionDenied"
+  The device token or folder ID may be incorrect or revoked. Ask the
+  administrator to enroll a new device.
+
+Certificate errors
+  Do not change ALLOW_INSECURE to true as a workaround. Ask whether a TLS
+  server name or CA file is required.
+
+The launcher window closes immediately
+  Start the launcher from Terminal or PowerShell so the error remains visible.
+  Send the error text, without any secret token, to the administrator.
+
+
+Support and updates
+-------------------
+
+Updates and issue reports:
+  https://github.com/hawoond/remote-sync
+
+Release downloads:
+  https://github.com/hawoond/remote-sync/releases
+
+Before installing a new version, stop the running client. Extract the new
+archive into a separate directory and move only the existing remote-sync.env
+into it.

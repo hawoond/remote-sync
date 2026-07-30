@@ -99,6 +99,8 @@ done
 
 cp "$repository_root/release/QUICKSTART_EN.txt" "$package_directory/"
 cp "$repository_root/release/QUICKSTART_KO.txt" "$package_directory/"
+cp "$repository_root/release/USER_GUIDE_EN.txt" "$package_directory/"
+cp "$repository_root/release/USER_GUIDE_KO.txt" "$package_directory/"
 cp "$repository_root/release/remote-sync.env.example" "$package_directory/"
 cp "$repository_root/.env.example" "$package_directory/server.env.example"
 cp -R "$repository_root/migrations" "$package_directory/"

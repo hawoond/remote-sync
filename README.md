@@ -43,15 +43,19 @@ and download the archive that matches the computer:
 After extracting the archive:
 
 1. Compare its SHA-256 value with `SHA256SUMS.txt` on the release page.
-2. Open `QUICKSTART_EN.txt` or `QUICKSTART_KO.txt`.
+2. Open `USER_GUIDE_EN.txt` or `USER_GUIDE_KO.txt`. It explains the separate
+   server and client roles, setup, restore, security warnings, and
+   troubleshooting without requiring source-code knowledge.
 3. Copy `remote-sync.env.example` to `remote-sync.env` and enter the server
    address, device token, and folder ID supplied by the server administrator.
 4. Start `Start Remote Sync.command` on macOS, `Start Remote Sync.cmd` on
    Windows, or `start-remote-sync.sh` on Linux.
 5. Choose a discovered Codex or Claude worktree from the numbered list.
 
-The archive also includes the server, migrator, and migrations for
-administrators. Release binaries are not code-signed or notarized, so macOS or
+Each archive is a combined distribution: normal users run `sync-agent`, while
+administrators use the included `sync-server`, `sync-migrate`, and migrations.
+The server and client still run as separate processes, usually on different
+computers. Release binaries are not code-signed or notarized, so macOS or
 Windows may display a security warning. Verify the checksum and download only
 from this repository's release page.
 
@@ -510,17 +514,21 @@ Remote Sync는 사용자가 선택한 로컬 폴더 또는 Git worktree를 중�
 압축을 푼 뒤 다음 순서로 실행합니다.
 
 1. 릴리즈 페이지의 `SHA256SUMS.txt`와 압축 파일의 SHA-256 값을 비교합니다.
-2. `QUICKSTART_KO.txt` 또는 `QUICKSTART_EN.txt`를 엽니다.
+2. `USER_GUIDE_KO.txt` 또는 `USER_GUIDE_EN.txt`를 엽니다. 소스 코드를 몰라도
+   따라 할 수 있도록 서버와 클라이언트 역할, 설치, 복원, 보안 경고,
+   문제 해결 방법을 설명합니다.
 3. `remote-sync.env.example`을 `remote-sync.env`로 복사하고 서버 관리자가
    전달한 서버 주소, 기기 토큰, 폴더 ID를 입력합니다.
 4. macOS는 `Start Remote Sync.command`, Windows는 `Start Remote Sync.cmd`,
    Linux는 `start-remote-sync.sh`를 실행합니다.
 5. 번호 목록에서 Codex 또는 Claude worktree를 직접 선택합니다.
 
-압축 파일에는 관리자를 위한 서버, 마이그레이터, migrations도 포함됩니다.
-릴리즈 실행 파일은 코드 서명이나 공증이 되어 있지 않아 macOS 또는 Windows가
-보안 경고를 표시할 수 있습니다. 체크섬을 확인하고 이 저장소의 릴리즈
-페이지에서만 다운로드하세요.
+각 압축 파일은 통합 배포본입니다. 일반 사용자는 `sync-agent`를 실행하고,
+관리자는 같은 파일에 포함된 `sync-server`, `sync-migrate`, migrations를
+사용합니다. 서버와 클라이언트 프로세스는 보통 서로 다른 컴퓨터에서 별도로
+실행됩니다. 릴리즈 실행 파일은 코드 서명이나 공증이 되어 있지 않아 macOS
+또는 Windows가 보안 경고를 표시할 수 있습니다. 체크섬을 확인하고 이
+저장소의 릴리즈 페이지에서만 다운로드하세요.
 
 ### 빌드와 테스트
 

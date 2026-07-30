@@ -1,6 +1,10 @@
 REMOTE SYNC QUICK START
 =======================
 
+Normal users run sync-agent only. The sync-server and sync-migrate programs in
+the same archive are administrator tools. See USER_GUIDE_EN.txt for complete
+installation, restore, server setup, and troubleshooting instructions.
+
 1. Verify the download
 ----------------------
 Compare the archive checksum with SHA256SUMS.txt on the GitHub Release page.
@@ -56,6 +60,9 @@ On Windows, replace ./start-remote-sync.sh with "Start Remote Sync.cmd".
 
 The archive also contains sync-server, sync-migrate, migrations, and a server
 environment example for administrators.
+The server and client run separately. Normal users receive device-specific
+connection details from the administrator. Do not copy remote-sync.env or a
+device token from another computer.
 
 Security notice
 ---------------
