@@ -1,0 +1,13 @@
+.git
+.github
+.env
+.env.*
+.tools
+bin
+data
+dist
+coverage.out
+*.db
+*.log
+*.prof
+*.test

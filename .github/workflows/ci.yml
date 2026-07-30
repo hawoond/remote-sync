@@ -24,3 +24,23 @@ jobs:
         run: go vet ./...
       - name: Build
         run: go build ./cmd/...
+      - name: Validate container setup
+        run: |
+          sh -n scripts/init-env.sh scripts/docker-compose.sh
+          test_directory="$(mktemp -d)"
+          trap 'rm -rf "$test_directory"' EXIT
+
+          ./scripts/init-env.sh \
+            --database bundled \
+            --output "$test_directory/bundled.env"
+          REMOTE_SYNC_ENV_FILE="$test_directory/bundled.env" \
+            ./scripts/docker-compose.sh config --quiet
+
+          DATABASE_URL='postgres://remote_sync:test-only-password@db.example.invalid:5432/remote_sync?sslmode=require' \
+            ./scripts/init-env.sh \
+            --database external \
+            --output "$test_directory/external.env"
+          REMOTE_SYNC_ENV_FILE="$test_directory/external.env" \
+            ./scripts/docker-compose.sh config --quiet
+
+          docker build --tag remote-sync:test .

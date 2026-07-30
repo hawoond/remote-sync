@@ -4,7 +4,7 @@ TOOLS_DIR := $(CURDIR)/.tools/bin
 PROTOC_GEN_GO := $(TOOLS_DIR)/protoc-gen-go
 PROTOC_GEN_GO_GRPC := $(TOOLS_DIR)/protoc-gen-go-grpc
 
-.PHONY: tools generate format test vet build check clean
+.PHONY: tools generate format test vet build check docker-init docker-up docker-down docker-logs clean
 
 tools:
 	mkdir -p $(TOOLS_DIR)
@@ -29,9 +29,22 @@ vet:
 build:
 	mkdir -p bin
 	go build -trimpath -o bin/sync-server ./cmd/sync-server
+	go build -trimpath -o bin/sync-migrate ./cmd/sync-migrate
 	go build -trimpath -o bin/sync-agent ./cmd/sync-agent
 
 check: generate format test vet build
+
+docker-init:
+	./scripts/init-env.sh
+
+docker-up:
+	./scripts/docker-compose.sh up -d --build
+
+docker-down:
+	./scripts/docker-compose.sh down
+
+docker-logs:
+	./scripts/docker-compose.sh logs -f server
 
 clean:
 	rm -rf bin .tools coverage.out

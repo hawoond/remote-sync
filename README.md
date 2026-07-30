@@ -34,40 +34,97 @@ make check
 ```
 
 `make check` regenerates protobuf code, formats the source, runs race-enabled
-tests, runs `go vet`, and builds the server and agent.
+tests, runs `go vet`, and builds the server, migrator, and agent.
 
-### Local development quick start
+### Docker server quick start
 
-Start PostgreSQL:
+Docker Compose can run the server, schema migration, blob volume, and optionally
+PostgreSQL. Start by creating a private `.env` file:
 
 ```sh
-docker compose up -d postgres
+./scripts/init-env.sh
 ```
 
-Create development identifiers and apply the migration:
+The setup always asks which database deployment to use:
+
+1. **Bundled PostgreSQL** — Compose starts `postgres:18-alpine`, waits for its
+   health check, applies migrations, and then starts `sync-server`.
+2. **External PostgreSQL** — Compose starts no database container. It applies
+   migrations to the PostgreSQL `DATABASE_URL` supplied by the user and starts
+   the server only if migration succeeds.
+
+The choice is between bundled and user-managed PostgreSQL. PostgreSQL remains
+the supported metadata engine; an external URL can point to a local instance or
+a managed service such as RDS, Cloud SQL, Neon, or Supabase.
+The wrapper selects `docker-compose.yml` for bundled mode and
+`docker-compose.external-db.yml` for external mode.
+
+For automation, make the selection explicitly:
 
 ```sh
-export DATABASE_URL='postgres://remote_sync:remote_sync@localhost:5432/remote_sync?sslmode=disable'
-export SYNC_USER_ID="$(uuidgen)"
-export SYNC_DEVICE_ID="$(uuidgen)"
-export SYNC_FOLDER_ID="$(uuidgen)"
-export SYNC_DEVICE_TOKEN="$(openssl rand -hex 32)"
+# Bundled database
+./scripts/init-env.sh --database bundled
 
-go run ./cmd/sync-migrate
+# External database
+DATABASE_URL='postgres://user:password@db.example.com:5432/remote_sync?sslmode=require' \
+  ./scripts/init-env.sh --database external
 ```
 
-Start the server with development bootstrap and plaintext transport enabled:
+The script creates random user, device, and folder UUIDs, a database password,
+and a device token. It writes the file with mode `0600`, refuses to overwrite
+an existing file, and `.env` is ignored by Git.
+
+Start the selected stack:
 
 ```sh
+./scripts/docker-compose.sh
+```
+
+With no arguments, the wrapper runs `docker compose up -d --build` against the
+Compose file selected by `DATABASE_MODE`. The same wrapper handles normal
+Compose commands:
+
+```sh
+./scripts/docker-compose.sh ps
+./scripts/docker-compose.sh logs -f server
+./scripts/docker-compose.sh down
+```
+
+The equivalent convenience targets are `make docker-init`, `make docker-up`,
+`make docker-logs`, and `make docker-down`.
+
+`down` preserves the PostgreSQL and blob volumes. Use `down --volumes` only
+when the stored database and blobs should be permanently removed.
+
+The server and PostgreSQL ports bind to `127.0.0.1` by default. The generated
+configuration uses `ALLOW_INSECURE=true` for local operation. Before binding
+`REMOTE_SYNC_BIND_ADDRESS=0.0.0.0`, mount the certificate and private-key files
+into the server container, set their container paths in `TLS_CERT_FILE` and
+`TLS_KEY_FILE`, and set `ALLOW_INSECURE=false`.
+
+### Local development from source
+
+Start only PostgreSQL with the bundled Compose file:
+
+```sh
+docker compose --env-file .env up -d postgres
+```
+
+Use the host-facing database URL, then run migration and server processes:
+
+```sh
+export DATABASE_URL='postgres://remote_sync:<password>@localhost:5432/remote_sync?sslmode=disable'
 export BLOB_ROOT='./data/blobs'
+export SYNC_USER_ID='<user UUID from .env>'
+export SYNC_DEVICE_ID='<device UUID from .env>'
+export SYNC_FOLDER_ID='<folder UUID from .env>'
+export SYNC_DEVICE_TOKEN='<device token from .env>'
 export ALLOW_INSECURE=true
 export DEV_BOOTSTRAP=true
 
+go run ./cmd/sync-migrate
 go run ./cmd/sync-server
 ```
-
-`ALLOW_INSECURE=true` is only for local development. Production startup
-requires `TLS_CERT_FILE` and `TLS_KEY_FILE`.
 
 ### Discover Codex and Claude worktrees
 
@@ -218,6 +275,23 @@ are not reported because Remote Sync validates Git worktrees.
 
 ### Runtime configuration
 
+Docker setup variables:
+
+| Variable | Used with | Default | Description |
+| --- | --- | --- | --- |
+| `DATABASE_MODE` | Wrapper | Selected during setup | `bundled` or `external` |
+| `COMPOSE_PROJECT_NAME` | Both modes | `remote-sync` | Compose project and resource prefix |
+| `DATABASE_URL` | External DB | — | User-selected PostgreSQL connection string |
+| `POSTGRES_DB` | Bundled DB | `remote_sync` | Bundled database name |
+| `POSTGRES_USER` | Bundled DB | `remote_sync` | Bundled database user |
+| `POSTGRES_PASSWORD` | Bundled DB | Random | Bundled database password |
+| `POSTGRES_BIND_ADDRESS` | Bundled DB | `127.0.0.1` | Host address for PostgreSQL |
+| `POSTGRES_PORT` | Bundled DB | `5432` | Host PostgreSQL port |
+| `REMOTE_SYNC_BIND_ADDRESS` | Server | `127.0.0.1` | Host address for gRPC |
+| `REMOTE_SYNC_PORT` | Server | `8443` | Host gRPC port |
+| `REMOTE_SYNC_IMAGE` | Both modes | `remote-sync:local` | Image name or prebuilt image reference |
+| `REMOTE_SYNC_ENV_FILE` | Wrapper | `.env` | Alternate environment-file path |
+
 Server variables:
 
 | Variable | Required | Default | Description |
@@ -256,8 +330,10 @@ Agent variables:
 | `TLS_SERVER_NAME` | No | Address host | TLS server name override |
 | `ALLOW_INSECURE` | No | `false` | Disable TLS for local development only |
 
-The server never applies migrations automatically. Run `sync-migrate` before
-starting a server version that requires a new schema.
+The server binary never applies migrations automatically. Both Compose modes
+run `sync-migrate` as a separate one-shot service and start the server only
+after it succeeds. When running binaries directly, execute `sync-migrate`
+before starting a server version that requires a new schema.
 
 ### Current scope
 
@@ -298,41 +374,101 @@ make generate
 make check
 ```
 
-`make check`는 protobuf 코드 재생성, 포맷, race 테스트, `go vet`, 서버·에이전트
-빌드를 모두 실행합니다.
+`make check`는 protobuf 코드 재생성, 포맷, race 테스트, `go vet`,
+서버·마이그레이터·에이전트 빌드를 모두 실행합니다.
 
-### 로컬 개발 빠른 시작
+### Docker 서버 빠른 시작
 
-PostgreSQL을 실행합니다.
+Docker Compose로 서버, 스키마 마이그레이션, Blob 볼륨과 선택한 경우
+PostgreSQL까지 실행할 수 있습니다. 먼저 비공개 `.env` 파일을 만듭니다.
 
 ```sh
-docker compose up -d postgres
+./scripts/init-env.sh
 ```
 
-개발용 식별자를 만들고 마이그레이션을 적용합니다.
+설정 과정에서 사용할 데이터베이스 배포 방식을 반드시 선택합니다.
+
+1. **내장 PostgreSQL** — Compose가 `postgres:18-alpine`을 실행하고
+   health check 통과를 기다린 뒤 마이그레이션과 `sync-server`를 순서대로
+   실행합니다.
+2. **외부 PostgreSQL** — 데이터베이스 컨테이너를 실행하지 않습니다. 사용자가
+   지정한 `DATABASE_URL`에 마이그레이션을 적용하고, 성공한 경우에만 서버를
+   시작합니다.
+
+선택 대상은 내장 PostgreSQL과 사용자 관리 PostgreSQL입니다. 메타데이터
+엔진은 PostgreSQL을 사용하며, 외부 URL에는 로컬 DB뿐 아니라 RDS, Cloud SQL,
+Neon, Supabase 같은 관리형 서비스를 지정할 수 있습니다.
+래퍼는 내장 모드에서 `docker-compose.yml`, 외부 모드에서
+`docker-compose.external-db.yml`을 선택합니다.
+
+자동화 환경에서는 선택을 인자로 명시합니다.
 
 ```sh
-export DATABASE_URL='postgres://remote_sync:remote_sync@localhost:5432/remote_sync?sslmode=disable'
-export SYNC_USER_ID="$(uuidgen)"
-export SYNC_DEVICE_ID="$(uuidgen)"
-export SYNC_FOLDER_ID="$(uuidgen)"
-export SYNC_DEVICE_TOKEN="$(openssl rand -hex 32)"
+# 내장 데이터베이스
+./scripts/init-env.sh --database bundled
 
-go run ./cmd/sync-migrate
+# 외부 데이터베이스
+DATABASE_URL='postgres://user:password@db.example.com:5432/remote_sync?sslmode=require' \
+  ./scripts/init-env.sh --database external
 ```
 
-개발용 레코드 생성과 평문 전송을 허용해 서버를 실행합니다.
+스크립트는 사용자·기기·폴더 UUID, DB 비밀번호와 기기 토큰을 무작위로 만들고
+파일 권한을 `0600`으로 설정합니다. 기존 파일은 덮어쓰지 않으며 `.env`는
+Git에서 제외됩니다.
+
+선택한 구성을 실행합니다.
 
 ```sh
+./scripts/docker-compose.sh
+```
+
+인자가 없으면 `DATABASE_MODE`에 맞는 Compose 파일을 선택해
+`docker compose up -d --build`를 실행합니다. 같은 래퍼로 일반 Compose
+명령도 사용할 수 있습니다.
+
+```sh
+./scripts/docker-compose.sh ps
+./scripts/docker-compose.sh logs -f server
+./scripts/docker-compose.sh down
+```
+
+같은 작업은 `make docker-init`, `make docker-up`, `make docker-logs`,
+`make docker-down`으로도 실행할 수 있습니다.
+
+`down`은 PostgreSQL과 Blob 볼륨을 보존합니다. 저장된 DB와 Blob을 영구
+삭제하려는 경우에만 `down --volumes`를 사용하세요.
+
+서버와 PostgreSQL 포트는 기본적으로 `127.0.0.1`에만 바인딩됩니다. 생성된
+설정의 `ALLOW_INSECURE=true`는 로컬 실행용입니다.
+`REMOTE_SYNC_BIND_ADDRESS=0.0.0.0`으로 외부에 공개하기 전에는 인증서와
+개인 키를 서버 컨테이너에 읽기 전용으로 마운트하고, 컨테이너 내부 경로를
+`TLS_CERT_FILE`과 `TLS_KEY_FILE`에 지정한 뒤 `ALLOW_INSECURE=false`로
+변경하세요.
+
+### 소스 기반 로컬 개발
+
+내장 Compose 파일에서 PostgreSQL만 실행합니다.
+
+```sh
+docker compose --env-file .env up -d postgres
+```
+
+호스트 접속용 DB URL과 `.env`의 식별자를 사용해 마이그레이션과 서버를
+실행합니다.
+
+```sh
+export DATABASE_URL='postgres://remote_sync:<password>@localhost:5432/remote_sync?sslmode=disable'
 export BLOB_ROOT='./data/blobs'
+export SYNC_USER_ID='<.env의 사용자 UUID>'
+export SYNC_DEVICE_ID='<.env의 기기 UUID>'
+export SYNC_FOLDER_ID='<.env의 폴더 UUID>'
+export SYNC_DEVICE_TOKEN='<.env의 기기 토큰>'
 export ALLOW_INSECURE=true
 export DEV_BOOTSTRAP=true
 
+go run ./cmd/sync-migrate
 go run ./cmd/sync-server
 ```
-
-`ALLOW_INSECURE=true`는 로컬 개발에서만 사용해야 합니다. 운영 실행에는
-`TLS_CERT_FILE`과 `TLS_KEY_FILE`이 필요합니다.
 
 ### Codex·Claude worktree 탐지
 
@@ -474,6 +610,23 @@ $env:SYNC_DISCOVERY_PROJECT_ROOTS = 'D:\Projects\Storefront;D:\Projects\Payments
 
 ### 실행 설정
 
+Docker 설정 변수:
+
+| 변수 | 사용 모드 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `DATABASE_MODE` | 래퍼 | 설정 시 선택 | `bundled` 또는 `external` |
+| `COMPOSE_PROJECT_NAME` | 두 모드 | `remote-sync` | Compose 프로젝트·리소스 접두사 |
+| `DATABASE_URL` | 외부 DB | — | 사용자가 선택한 PostgreSQL 연결 문자열 |
+| `POSTGRES_DB` | 내장 DB | `remote_sync` | 내장 데이터베이스 이름 |
+| `POSTGRES_USER` | 내장 DB | `remote_sync` | 내장 데이터베이스 사용자 |
+| `POSTGRES_PASSWORD` | 내장 DB | 무작위 값 | 내장 데이터베이스 비밀번호 |
+| `POSTGRES_BIND_ADDRESS` | 내장 DB | `127.0.0.1` | PostgreSQL 호스트 바인딩 주소 |
+| `POSTGRES_PORT` | 내장 DB | `5432` | PostgreSQL 호스트 포트 |
+| `REMOTE_SYNC_BIND_ADDRESS` | 서버 | `127.0.0.1` | gRPC 호스트 바인딩 주소 |
+| `REMOTE_SYNC_PORT` | 서버 | `8443` | gRPC 호스트 포트 |
+| `REMOTE_SYNC_IMAGE` | 두 모드 | `remote-sync:local` | 이미지 이름 또는 사전 빌드 이미지 |
+| `REMOTE_SYNC_ENV_FILE` | 래퍼 | `.env` | 다른 환경 파일 경로 |
+
 서버 환경 변수:
 
 | 변수 | 필수 | 기본값 | 설명 |
@@ -511,8 +664,10 @@ $env:SYNC_DISCOVERY_PROJECT_ROOTS = 'D:\Projects\Storefront;D:\Projects\Payments
 | `TLS_SERVER_NAME` | 선택 | 주소의 호스트 | TLS 서버 이름 재정의 |
 | `ALLOW_INSECURE` | 선택 | `false` | 로컬 개발에서만 TLS 비활성화 |
 
-서버는 마이그레이션을 자동 적용하지 않습니다. 새 스키마가 필요한 서버 버전을
-실행하기 전에 `sync-migrate`를 별도 실행해야 합니다.
+서버 바이너리는 마이그레이션을 자동 적용하지 않습니다. 두 Compose 모드 모두
+`sync-migrate`를 별도 일회성 서비스로 실행하고, 성공한 경우에만 서버를
+시작합니다. 바이너리를 직접 실행할 때는 새 스키마가 필요한 서버 버전을
+시작하기 전에 `sync-migrate`를 실행해야 합니다.
 
 ### 현재 범위
 

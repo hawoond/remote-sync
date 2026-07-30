@@ -14,6 +14,7 @@ x-runtime-security: &runtime-security
     - no-new-privileges:true
 
 x-server-environment: &server-environment
+  DATABASE_URL: ${DATABASE_URL:?Set an external PostgreSQL DATABASE_URL}
   BLOB_ROOT: /var/lib/remote-sync/blobs
   LISTEN_ADDR: :8443
   SYNC_DEVICE_ID: ${SYNC_DEVICE_ID:?Run ./scripts/init-env.sh first}
@@ -31,26 +32,6 @@ x-server-environment: &server-environment
   MAX_CHUNK_SIZE_BYTES: ${MAX_CHUNK_SIZE_BYTES:-1048576}
 
 services:
-  postgres:
-    image: postgres:18-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-remote_sync}
-      POSTGRES_USER: ${POSTGRES_USER:-remote_sync}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run ./scripts/init-env.sh first}
-    ports:
-      - "${POSTGRES_BIND_ADDRESS:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
-      interval: 2s
-      timeout: 3s
-      retries: 30
-      start_period: 5s
-    volumes:
-      - remote-sync-postgres:/var/lib/postgresql
-
   migrate:
     <<:
       - *runtime-image
@@ -62,10 +43,7 @@ services:
       - -dir
       - /app/migrations
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-remote_sync}:${POSTGRES_PASSWORD:?Run ./scripts/init-env.sh first}@postgres:5432/${POSTGRES_DB:-remote_sync}?sslmode=disable
-    depends_on:
-      postgres:
-        condition: service_healthy
+      DATABASE_URL: ${DATABASE_URL:?Set an external PostgreSQL DATABASE_URL}
 
   server:
     <<:
@@ -74,11 +52,7 @@ services:
     restart: unless-stopped
     environment:
       <<: *server-environment
-      DATABASE_URL: postgres://${POSTGRES_USER:-remote_sync}:${POSTGRES_PASSWORD:?Run ./scripts/init-env.sh first}@postgres:5432/${POSTGRES_DB:-remote_sync}?sslmode=disable
     depends_on:
-      postgres:
-        condition: service_healthy
-        restart: true
       migrate:
         condition: service_completed_successfully
     ports:
@@ -96,5 +70,4 @@ services:
       - remote-sync-blobs:/var/lib/remote-sync/blobs
 
 volumes:
-  remote-sync-postgres:
   remote-sync-blobs:
