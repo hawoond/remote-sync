@@ -335,15 +335,6 @@ run `sync-migrate` as a separate one-shot service and start the server only
 after it succeeds. When running binaries directly, execute `sync-migrate`
 before starting a server version that requires a new schema.
 
-### Current scope
-
-The current implementation is the Phase 1 backup foundation: portable path
-validation, stable snapshot hashing, persistent client operations, resumable
-whole-file uploads, immutable versions and tombstones, idempotent commits,
-change cursors, authenticated gRPC transport, and interactive Codex/Claude
-worktree selection. Restore orchestration, multi-device enrollment,
-safety-window policy, and garbage collection remain follow-up work.
-
 ## 한국어
 
 Remote Sync는 사용자가 선택한 로컬 폴더 또는 Git worktree를 중앙 서버에
@@ -668,11 +659,3 @@ Docker 설정 변수:
 `sync-migrate`를 별도 일회성 서비스로 실행하고, 성공한 경우에만 서버를
 시작합니다. 바이너리를 직접 실행할 때는 새 스키마가 필요한 서버 버전을
 시작하기 전에 `sync-migrate`를 실행해야 합니다.
-
-### 현재 범위
-
-현재 구현은 Phase 1 백업 기반입니다. 이식 가능한 경로 검증, 안정된 스냅샷
-해싱, 영속 클라이언트 작업, 재개 가능한 전체 파일 업로드, 불변 버전과 tombstone,
-멱등 커밋, 변경 커서, 인증된 gRPC 전송, Codex·Claude worktree 탐지와 사용자
-선택을 포함합니다. 복원 오케스트레이션, 다중 기기 등록, 안전 유예 정책,
-Garbage Collection은 후속 범위입니다.
