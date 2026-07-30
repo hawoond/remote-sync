@@ -151,6 +151,7 @@ func isInteractive(file *os.File) bool {
 func writeAgentUsage(output io.Writer) {
 	_, _ = fmt.Fprintln(output, `Usage:
   sync-agent
+  sync-agent --version
   sync-agent discover [--provider all|codex|claude] [--json]
   sync-agent enrollment create [--role reader|writer|restore-admin] [--expires 15m]
   sync-agent enroll [--name NAME] [--platform PLATFORM]

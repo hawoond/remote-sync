@@ -4,7 +4,11 @@ TOOLS_DIR := $(CURDIR)/.tools/bin
 PROTOC_GEN_GO := $(TOOLS_DIR)/protoc-gen-go
 PROTOC_GEN_GO_GRPC := $(TOOLS_DIR)/protoc-gen-go-grpc
 
-.PHONY: tools generate format test vet build check docker-init docker-up docker-down docker-logs clean
+RELEASE_VERSION ?= v0.0.0-dev
+RELEASE_GOOS ?= $(shell go env GOOS)
+RELEASE_GOARCH ?= $(shell go env GOARCH)
+
+.PHONY: tools generate format test vet build check release-package docker-init docker-up docker-down docker-logs clean
 
 tools:
 	mkdir -p $(TOOLS_DIR)
@@ -21,7 +25,7 @@ format:
 	gofmt -w $$(find . -name '*.go' -not -path './.tools/*')
 
 test:
-	go test -race ./...
+	go test -race -p 1 ./...
 
 vet:
 	go vet ./...
@@ -33,6 +37,13 @@ build:
 	go build -trimpath -o bin/sync-agent ./cmd/sync-agent
 
 check: generate format test vet build
+
+release-package:
+	./scripts/package-release.sh \
+		"$(RELEASE_VERSION)" \
+		"$(RELEASE_GOOS)" \
+		"$(RELEASE_GOARCH)" \
+		dist
 
 docker-init:
 	./scripts/init-env.sh
@@ -47,4 +58,4 @@ docker-logs:
 	./scripts/docker-compose.sh logs -f server
 
 clean:
-	rm -rf bin .tools coverage.out
+	rm -rf bin dist .tools coverage.out

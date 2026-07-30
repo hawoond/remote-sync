@@ -80,6 +80,19 @@ func TestRealMainHelp(t *testing.T) {
 	}
 }
 
+func TestRealMainVersion(t *testing.T) {
+	t.Parallel()
+
+	var output, errorOutput bytes.Buffer
+	code := realMain([]string{"--version"}, nil, &output, &errorOutput)
+	if code != 0 {
+		t.Fatalf("exit code = %d, stderr = %s", code, errorOutput.String())
+	}
+	if !strings.Contains(output.String(), "sync-agent") {
+		t.Fatalf("version output = %q", output.String())
+	}
+}
+
 func TestPublishRestoredFileWithoutReplacement(t *testing.T) {
 	t.Parallel()
 

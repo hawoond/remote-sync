@@ -1,0 +1,64 @@
+REMOTE SYNC QUICK START
+=======================
+
+1. Verify the download
+----------------------
+Compare the archive checksum with SHA256SUMS.txt on the GitHub Release page.
+
+macOS:
+  shasum -a 256 remote-sync_*.tar.gz
+
+Windows PowerShell:
+  Get-FileHash .\remote-sync_*.zip -Algorithm SHA256
+
+Linux:
+  sha256sum remote-sync_*.tar.gz
+
+2. Configure the agent
+----------------------
+Extract the archive. Copy remote-sync.env.example to remote-sync.env in the
+same directory. Ask the server administrator for these three values and replace
+the examples:
+
+  SYNC_SERVER_ADDRESS
+  SYNC_DEVICE_TOKEN
+  SYNC_FOLDER_ID
+
+The configuration file contains a device credential. Do not share it.
+
+3. Start Remote Sync
+--------------------
+macOS:
+  Double-click "Start Remote Sync.command", or run it from Terminal.
+
+Windows:
+  Double-click "Start Remote Sync.cmd".
+
+Linux:
+  Run ./start-remote-sync.sh from a terminal.
+
+When SYNC_WORKTREE is empty, the agent finds Codex and Claude Git worktrees and
+shows a numbered list. Choose the folder you want to back up. To use the same
+folder on later starts without another prompt, put the selected ID or absolute
+path in SYNC_WORKTREE inside remote-sync.env.
+
+Stop the agent with Ctrl+C or by closing its terminal window.
+
+4. Useful commands
+------------------
+Pass a command to the launcher, for example:
+
+  ./start-remote-sync.sh --version
+  ./start-remote-sync.sh discover
+  ./start-remote-sync.sh restore --target /path/to/restore
+
+On Windows, replace ./start-remote-sync.sh with "Start Remote Sync.cmd".
+
+The archive also contains sync-server, sync-migrate, migrations, and a server
+environment example for administrators.
+
+Security notice
+---------------
+These community release binaries are not code-signed or notarized. macOS
+Gatekeeper or Windows SmartScreen may show a warning. Verify SHA256SUMS.txt and
+download only from https://github.com/hawoond/remote-sync/releases.

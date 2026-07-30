@@ -19,6 +19,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hawoond/remote-sync/internal/agent"
+	"github.com/hawoond/remote-sync/internal/buildinfo"
 	"github.com/hawoond/remote-sync/internal/localdb"
 	"github.com/hawoond/remote-sync/internal/transport/grpcclient"
 )
@@ -43,6 +44,11 @@ func main() {
 }
 
 func realMain(arguments []string, input *os.File, output, errorOutput io.Writer) int {
+	if buildinfo.Requested(arguments) {
+		_, _ = fmt.Fprintln(output, buildinfo.String("sync-agent"))
+		return 0
+	}
+
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 

@@ -25,16 +25,51 @@ resumable transfers, and recovery after process or network failures.
 - Protocol Buffers compiler
 - Docker for the local PostgreSQL development environment
 
+### Download a ready-to-run release
+
+Using `sync-agent` from a release does not require Go, Git, Protocol Buffers, or
+Docker. Open the [latest release](https://github.com/hawoond/remote-sync/releases/latest)
+and download the archive that matches the computer:
+
+| Computer | Release filename |
+| --- | --- |
+| Apple silicon Mac | `remote-sync_*_darwin_arm64.tar.gz` |
+| Intel Mac | `remote-sync_*_darwin_amd64.tar.gz` |
+| 64-bit Windows | `remote-sync_*_windows_amd64.zip` |
+| Windows on ARM | `remote-sync_*_windows_arm64.zip` |
+| 64-bit Linux | `remote-sync_*_linux_amd64.tar.gz` |
+| Linux on ARM | `remote-sync_*_linux_arm64.tar.gz` |
+
+After extracting the archive:
+
+1. Compare its SHA-256 value with `SHA256SUMS.txt` on the release page.
+2. Open `QUICKSTART_EN.txt` or `QUICKSTART_KO.txt`.
+3. Copy `remote-sync.env.example` to `remote-sync.env` and enter the server
+   address, device token, and folder ID supplied by the server administrator.
+4. Start `Start Remote Sync.command` on macOS, `Start Remote Sync.cmd` on
+   Windows, or `start-remote-sync.sh` on Linux.
+5. Choose a discovered Codex or Claude worktree from the numbered list.
+
+The archive also includes the server, migrator, and migrations for
+administrators. Release binaries are not code-signed or notarized, so macOS or
+Windows may display a security warning. Verify the checksum and download only
+from this repository's release page.
+
 ### Build and test
 
 ```sh
 make tools
 make generate
 make check
+
+# Build one release archive for the current operating system and CPU.
+make release-package RELEASE_VERSION=v0.1.0
 ```
 
 `make check` regenerates protobuf code, formats the source, runs race-enabled
-tests, runs `go vet`, and builds the server, migrator, and agent.
+tests, runs `go vet`, and builds the server, migrator, and agent. Pushing a
+semantic `v*` tag builds all six release archives, generates SHA-256 checksums,
+and publishes a GitHub Release.
 
 ### Docker server quick start
 
@@ -457,16 +492,51 @@ Remote Sync는 사용자가 선택한 로컬 폴더 또는 Git worktree를 중�
 - Protocol Buffers 컴파일러
 - 로컬 PostgreSQL 개발 환경용 Docker
 
+### 바로 실행할 수 있는 릴리즈 다운로드
+
+릴리즈의 `sync-agent`를 사용할 때는 Go, Git, Protocol Buffers, Docker를
+설치하지 않아도 됩니다. [최신 릴리즈](https://github.com/hawoond/remote-sync/releases/latest)
+페이지에서 컴퓨터에 맞는 압축 파일을 받습니다.
+
+| 컴퓨터 | 릴리즈 파일명 |
+| --- | --- |
+| Apple Silicon Mac | `remote-sync_*_darwin_arm64.tar.gz` |
+| Intel Mac | `remote-sync_*_darwin_amd64.tar.gz` |
+| 64비트 Windows | `remote-sync_*_windows_amd64.zip` |
+| Windows on ARM | `remote-sync_*_windows_arm64.zip` |
+| 64비트 Linux | `remote-sync_*_linux_amd64.tar.gz` |
+| Linux on ARM | `remote-sync_*_linux_arm64.tar.gz` |
+
+압축을 푼 뒤 다음 순서로 실행합니다.
+
+1. 릴리즈 페이지의 `SHA256SUMS.txt`와 압축 파일의 SHA-256 값을 비교합니다.
+2. `QUICKSTART_KO.txt` 또는 `QUICKSTART_EN.txt`를 엽니다.
+3. `remote-sync.env.example`을 `remote-sync.env`로 복사하고 서버 관리자가
+   전달한 서버 주소, 기기 토큰, 폴더 ID를 입력합니다.
+4. macOS는 `Start Remote Sync.command`, Windows는 `Start Remote Sync.cmd`,
+   Linux는 `start-remote-sync.sh`를 실행합니다.
+5. 번호 목록에서 Codex 또는 Claude worktree를 직접 선택합니다.
+
+압축 파일에는 관리자를 위한 서버, 마이그레이터, migrations도 포함됩니다.
+릴리즈 실행 파일은 코드 서명이나 공증이 되어 있지 않아 macOS 또는 Windows가
+보안 경고를 표시할 수 있습니다. 체크섬을 확인하고 이 저장소의 릴리즈
+페이지에서만 다운로드하세요.
+
 ### 빌드와 테스트
 
 ```sh
 make tools
 make generate
 make check
+
+# 현재 운영체제와 CPU용 릴리즈 압축 파일을 만듭니다.
+make release-package RELEASE_VERSION=v0.1.0
 ```
 
 `make check`는 protobuf 코드 재생성, 포맷, race 테스트, `go vet`,
-서버·마이그레이터·에이전트 빌드를 모두 실행합니다.
+서버·마이그레이터·에이전트 빌드를 모두 실행합니다. semantic `v*` 태그를
+푸시하면 6개 플랫폼 압축 파일과 SHA-256 체크섬을 만들고 GitHub Release를
+게시합니다.
 
 ### Docker 서버 빠른 시작
 

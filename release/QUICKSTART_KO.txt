@@ -1,0 +1,63 @@
+REMOTE SYNC 빠른 시작
+=====================
+
+1. 다운로드 확인
+----------------
+GitHub Release 페이지의 SHA256SUMS.txt와 받은 압축 파일의 체크섬을 비교합니다.
+
+macOS:
+  shasum -a 256 remote-sync_*.tar.gz
+
+Windows PowerShell:
+  Get-FileHash .\remote-sync_*.zip -Algorithm SHA256
+
+Linux:
+  sha256sum remote-sync_*.tar.gz
+
+2. 에이전트 설정
+----------------
+압축을 푼 뒤 remote-sync.env.example을 같은 폴더의 remote-sync.env로
+복사합니다. 서버 관리자에게 아래 세 값을 받아 예시 값을 교체합니다.
+
+  SYNC_SERVER_ADDRESS
+  SYNC_DEVICE_TOKEN
+  SYNC_FOLDER_ID
+
+설정 파일에는 기기 인증 정보가 들어 있으므로 다른 사람에게 공유하지 마세요.
+
+3. Remote Sync 시작
+-------------------
+macOS:
+  "Start Remote Sync.command"를 더블 클릭하거나 터미널에서 실행합니다.
+
+Windows:
+  "Start Remote Sync.cmd"를 더블 클릭합니다.
+
+Linux:
+  터미널에서 ./start-remote-sync.sh를 실행합니다.
+
+SYNC_WORKTREE가 비어 있으면 Codex와 Claude의 Git worktree를 찾아 번호 목록으로
+보여줍니다. 백업할 폴더를 직접 선택하세요. 다음 실행부터 묻지 않게 하려면
+선택 결과의 ID 또는 절대 경로를 remote-sync.env의 SYNC_WORKTREE에 입력합니다.
+
+Ctrl+C를 누르거나 터미널 창을 닫으면 에이전트가 종료됩니다.
+
+4. 유용한 명령
+---------------
+실행 파일 뒤에 명령을 붙여 사용할 수 있습니다.
+
+  ./start-remote-sync.sh --version
+  ./start-remote-sync.sh discover
+  ./start-remote-sync.sh restore --target /path/to/restore
+
+Windows에서는 ./start-remote-sync.sh 대신 "Start Remote Sync.cmd"를 사용합니다.
+
+압축 파일에는 서버 관리자를 위한 sync-server, sync-migrate, migrations,
+서버 환경 변수 예시도 포함됩니다.
+
+보안 안내
+---------
+이 커뮤니티 릴리즈 실행 파일은 코드 서명이나 공증이 되어 있지 않습니다.
+macOS Gatekeeper 또는 Windows SmartScreen이 경고할 수 있습니다.
+SHA256SUMS.txt를 확인하고
+https://github.com/hawoond/remote-sync/releases 에서만 다운로드하세요.

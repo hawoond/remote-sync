@@ -17,6 +17,7 @@ import (
 	syncv1 "github.com/hawoond/remote-sync/api/sync/v1"
 	"github.com/hawoond/remote-sync/internal/auth"
 	"github.com/hawoond/remote-sync/internal/blob"
+	"github.com/hawoond/remote-sync/internal/buildinfo"
 	"github.com/hawoond/remote-sync/internal/domain"
 	"github.com/hawoond/remote-sync/internal/garbage"
 	"github.com/hawoond/remote-sync/internal/metadata"
@@ -59,6 +60,11 @@ type config struct {
 }
 
 func main() {
+	if buildinfo.Requested(os.Args[1:]) {
+		fmt.Println(buildinfo.String("sync-server"))
+		return
+	}
+
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 

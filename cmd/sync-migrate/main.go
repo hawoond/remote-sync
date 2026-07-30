@@ -9,11 +9,17 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/hawoond/remote-sync/internal/buildinfo"
 	"github.com/hawoond/remote-sync/internal/migrate"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
+	if buildinfo.Requested(os.Args[1:]) {
+		fmt.Println(buildinfo.String("sync-migrate"))
+		return
+	}
+
 	var directory string
 	flag.StringVar(&directory, "dir", "migrations", "migration directory")
 	flag.Parse()
