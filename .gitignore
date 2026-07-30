@@ -1,0 +1,14 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+
+/bin/
+/dist/
+/.tools/
+/data/
+/coverage.out
+
+*.log
+*.prof
+*.test

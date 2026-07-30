@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package sync.v1;
+
+option go_package = "github.com/hawoond/remote-sync/api/sync/v1;syncv1";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service SyncService {
+  rpc OpenSync(stream ClientFrame) returns (stream ServerFrame);
+  rpc BeginUpload(BeginUploadRequest) returns (BeginUploadResponse);
+  rpc Upload(stream UploadChunk) returns (UploadResult);
+  rpc CommitChange(CommitChangeRequest) returns (CommitChangeResponse);
+  rpc Download(DownloadRequest) returns (stream DownloadChunk);
+  rpc ListChanges(ListChangesRequest) returns (ListChangesResponse);
+  rpc AckChanges(AckChangesRequest) returns (google.protobuf.Empty);
+}
+
+enum ChangeKind {
+  CHANGE_KIND_UNSPECIFIED = 0;
+  CHANGE_KIND_CREATE = 1;
+  CHANGE_KIND_MODIFY = 2;
+  CHANGE_KIND_DELETE = 3;
+  CHANGE_KIND_RESTORE = 4;
+}
+
+enum UploadDisposition {
+  UPLOAD_DISPOSITION_UNSPECIFIED = 0;
+  UPLOAD_DISPOSITION_OBJECT_PRESENT = 1;
+  UPLOAD_DISPOSITION_UPLOAD_REQUIRED = 2;
+}
+
+enum CommitDisposition {
+  COMMIT_DISPOSITION_UNSPECIFIED = 0;
+  COMMIT_DISPOSITION_COMMITTED = 1;
+  COMMIT_DISPOSITION_IDEMPOTENT_REPLAY = 2;
+  COMMIT_DISPOSITION_QUARANTINED = 3;
+  COMMIT_DISPOSITION_CONFLICT_COPY = 4;
+}
+
+message BeginUploadRequest {
+  string operation_id = 1;
+  string folder_id = 2;
+  string relative_path = 3;
+  optional string base_version_id = 4;
+  int64 size = 5;
+  bytes sha256 = 6;
+  int64 mtime_unix_nano = 7;
+  uint32 portable_mode = 8;
+  ChangeKind kind = 9;
+}
+
+message BeginUploadResponse {
+  UploadDisposition disposition = 1;
+  optional string upload_session_id = 2;
+  int64 next_offset = 3;
+  int32 max_chunk_size = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  string canonical_display_path = 6;
+}
+
+message UploadChunk {
+  string upload_session_id = 1;
+  int64 offset = 2;
+  bytes data = 3;
+}
+
+message UploadResult {
+  bytes sha256 = 1;
+  int64 size = 2;
+}
+
+message CommitChangeRequest {
+  string operation_id = 1;
+  string folder_id = 2;
+  string relative_path = 3;
+  optional string base_version_id = 4;
+  ChangeKind kind = 5;
+  optional string upload_session_id = 6;
+  optional bytes object_sha256 = 7;
+  int64 mtime_unix_nano = 8;
+  uint32 portable_mode = 9;
+  int64 size = 10;
+}
+
+message CommitChangeResponse {
+  CommitDisposition disposition = 1;
+  string version_id = 2;
+  int64 folder_sequence = 3;
+  string canonical_display_path = 4;
+  optional string quarantine_id = 5;
+}
+
+message ClientFrame {
+  string folder_id = 1;
+  int64 acknowledged_sequence = 2;
+}
+
+message ServerFrame {
+  string folder_id = 1;
+  int64 latest_sequence = 2;
+}
+
+message DownloadRequest {
+  bytes sha256 = 1;
+  int64 offset = 2;
+}
+
+message DownloadChunk {
+  int64 offset = 1;
+  bytes data = 2;
+}
+
+message ListChangesRequest {
+  string folder_id = 1;
+  int64 after_sequence = 2;
+  int32 limit = 3;
+}
+
+message Change {
+  int64 sequence = 1;
+  string entry_id = 2;
+  string version_id = 3;
+  string relative_path = 4;
+  ChangeKind kind = 5;
+  optional bytes object_sha256 = 6;
+  int64 size = 7;
+  int64 mtime_unix_nano = 8;
+  uint32 portable_mode = 9;
+}
+
+message ListChangesResponse {
+  repeated Change changes = 1;
+  int64 latest_sequence = 2;
+}
+
+message AckChangesRequest {
+  string folder_id = 1;
+  int64 sequence = 2;
+}
