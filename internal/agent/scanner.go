@@ -90,7 +90,16 @@ func (s *Scanner) Scan(ctx context.Context) (ScanReport, error) {
 		}
 		relative = filepath.ToSlash(relative)
 
+		if shouldSkipRelativePath(relative) {
+			if entry.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
 		if entry.IsDir() {
+			if isNestedRepository(fullPath) {
+				return filepath.SkipDir
+			}
 			return nil
 		}
 		if entry.Type()&os.ModeSymlink != 0 || !entry.Type().IsRegular() {

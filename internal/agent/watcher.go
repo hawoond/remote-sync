@@ -25,7 +25,7 @@ func (w *Watcher) Run(ctx context.Context, triggers chan<- struct{}) error {
 	}
 	defer watcher.Close()
 
-	if err := addDirectories(watcher, w.rootPath); err != nil {
+	if err := addDirectories(watcher, w.rootPath, w.rootPath); err != nil {
 		return err
 	}
 	for {
@@ -44,7 +44,7 @@ func (w *Watcher) Run(ctx context.Context, triggers chan<- struct{}) error {
 			if event.Has(fsnotify.Create) {
 				info, statErr := os.Lstat(event.Name)
 				if statErr == nil && info.IsDir() && info.Mode()&os.ModeSymlink == 0 {
-					if err := addDirectories(watcher, event.Name); err != nil {
+					if err := addDirectories(watcher, w.rootPath, event.Name); err != nil {
 						return err
 					}
 				}
@@ -57,8 +57,8 @@ func (w *Watcher) Run(ctx context.Context, triggers chan<- struct{}) error {
 	}
 }
 
-func addDirectories(watcher *fsnotify.Watcher, root string) error {
-	return filepath.WalkDir(root, func(path string, entry fs.DirEntry, walkErr error) error {
+func addDirectories(watcher *fsnotify.Watcher, root, start string) error {
+	return filepath.WalkDir(start, func(path string, entry fs.DirEntry, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
@@ -70,6 +70,15 @@ func addDirectories(watcher *fsnotify.Watcher, root string) error {
 		}
 		if !entry.IsDir() {
 			return nil
+		}
+		if path != root {
+			relative, err := filepath.Rel(root, path)
+			if err != nil {
+				return err
+			}
+			if shouldSkipRelativePath(relative) || isNestedRepository(path) {
+				return filepath.SkipDir
+			}
 		}
 		if err := watcher.Add(path); err != nil {
 			return fmt.Errorf("watch directory: %w", err)

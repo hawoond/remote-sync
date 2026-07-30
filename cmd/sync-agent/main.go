@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"flag"
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -36,22 +39,53 @@ type config struct {
 }
 
 func main() {
-	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
+	os.Exit(realMain(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
+}
 
-	cfg, err := loadConfig()
-	if err != nil {
-		logger.Error("invalid configuration", "error", err)
-		os.Exit(2)
-	}
-
+func realMain(arguments []string, input *os.File, output, errorOutput io.Writer) int {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
+	if len(arguments) > 0 {
+		switch arguments[0] {
+		case "discover":
+			err := runDiscoverCommand(ctx, arguments[1:], output, errorOutput)
+			if errors.Is(err, flag.ErrHelp) {
+				return 0
+			}
+			if err != nil {
+				_, _ = fmt.Fprintln(errorOutput, "sync-agent:", err)
+				return 2
+			}
+			return 0
+		case "help", "-h", "--help":
+			writeAgentUsage(output)
+			return 0
+		default:
+			_, _ = fmt.Fprintf(errorOutput, "sync-agent: unknown command %q\n", arguments[0])
+			writeAgentUsage(errorOutput)
+			return 2
+		}
+	}
+
+	rootPath, err := resolveSyncRoot(ctx, input, errorOutput)
+	if err != nil {
+		_, _ = fmt.Fprintln(errorOutput, "sync-agent:", err)
+		return 2
+	}
+	cfg, err := loadConfig(rootPath)
+	if err != nil {
+		_, _ = fmt.Fprintln(errorOutput, "sync-agent: invalid configuration:", err)
+		return 2
+	}
+
+	logger := slog.New(slog.NewJSONHandler(output, nil))
+	slog.SetDefault(logger)
 	if err := run(ctx, cfg, logger); err != nil {
 		logger.Error("agent stopped", "error", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 func run(ctx context.Context, cfg config, logger *slog.Logger) error {
@@ -153,7 +187,7 @@ func clientTLSConfig(cfg config) (*tls.Config, error) {
 	return tlsConfig, nil
 }
 
-func loadConfig() (config, error) {
+func loadConfig(rootPath string) (config, error) {
 	allowInsecure, err := boolEnvironment("ALLOW_INSECURE", false)
 	if err != nil {
 		return config{}, err
@@ -167,22 +201,6 @@ func loadConfig() (config, error) {
 		return config{}, err
 	}
 
-	rootPath := os.Getenv("SYNC_ROOT")
-	if rootPath == "" {
-		return config{}, errors.New("SYNC_ROOT is required")
-	}
-	rootPath, err = filepath.Abs(rootPath)
-	if err != nil {
-		return config{}, fmt.Errorf("resolve SYNC_ROOT: %w", err)
-	}
-	info, err := os.Stat(rootPath)
-	if err != nil {
-		return config{}, fmt.Errorf("inspect SYNC_ROOT: %w", err)
-	}
-	if !info.IsDir() {
-		return config{}, errors.New("SYNC_ROOT must be a directory")
-	}
-
 	folderID := os.Getenv("SYNC_FOLDER_ID")
 	if _, err := uuid.Parse(folderID); err != nil {
 		return config{}, errors.New("SYNC_FOLDER_ID must be a UUID")
@@ -193,7 +211,11 @@ func loadConfig() (config, error) {
 		if err != nil {
 			return config{}, fmt.Errorf("resolve user configuration directory: %w", err)
 		}
-		statePath = filepath.Join(configDirectory, "remote-sync", folderID+".db")
+		statePath = filepath.Join(
+			configDirectory,
+			"remote-sync",
+			defaultStateFilename(folderID, rootPath),
+		)
 	}
 	statePath, err = filepath.Abs(statePath)
 	if err != nil {
@@ -219,6 +241,11 @@ func loadConfig() (config, error) {
 		return config{}, errors.New("SYNC_DEVICE_TOKEN must contain at least 32 characters")
 	}
 	return cfg, nil
+}
+
+func defaultStateFilename(folderID, rootPath string) string {
+	sum := sha256.Sum256([]byte(filepath.Clean(rootPath)))
+	return fmt.Sprintf("%s-%x.db", folderID, sum[:6])
 }
 
 func boolEnvironment(name string, defaultValue bool) (bool, error) {
