@@ -15,6 +15,7 @@ service SyncService {
   rpc Download(DownloadRequest) returns (stream DownloadChunk);
   rpc ListChanges(ListChangesRequest) returns (ListChangesResponse);
   rpc AckChanges(AckChangesRequest) returns (google.protobuf.Empty);
+  rpc EnsureFolder(EnsureFolderRequest) returns (FolderRegistration);
   rpc CreateEnrollment(CreateEnrollmentRequest) returns (CreateEnrollmentResponse);
   rpc EnrollDevice(EnrollDeviceRequest) returns (EnrollDeviceResponse);
   rpc GetFolderPolicy(GetFolderPolicyRequest) returns (FolderPolicy);
@@ -170,6 +171,21 @@ message ListChangesResponse {
 message AckChangesRequest {
   string folder_id = 1;
   int64 sequence = 2;
+}
+
+message EnsureFolderRequest {
+  string source_folder_id = 1;
+  string client_key = 2;
+  string display_name = 3;
+  bool allow_source_binding = 4;
+}
+
+message FolderRegistration {
+  string folder_id = 1;
+  string client_key = 2;
+  string display_name = 3;
+  FolderRole role = 4;
+  bool created = 5;
 }
 
 message CreateEnrollmentRequest {

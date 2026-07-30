@@ -48,6 +48,14 @@ type DeviceCredentials struct {
 	Role        FolderRole
 }
 
+type FolderRegistration struct {
+	FolderID    string
+	ClientKey   string
+	DisplayName string
+	Role        FolderRole
+	Created     bool
+}
+
 type FolderPolicy struct {
 	FolderID      string
 	SafetyWindow  time.Duration

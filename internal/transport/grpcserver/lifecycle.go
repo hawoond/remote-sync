@@ -10,6 +10,34 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+func (s *Server) EnsureFolder(
+	ctx context.Context,
+	request *syncv1.EnsureFolderRequest,
+) (*syncv1.FolderRegistration, error) {
+	deviceID, err := s.resolver.Resolve(ctx)
+	if err != nil {
+		return nil, toStatus(err)
+	}
+	registration, err := s.engine.EnsureFolder(
+		ctx,
+		deviceID,
+		request.GetSourceFolderId(),
+		request.GetClientKey(),
+		request.GetDisplayName(),
+		request.GetAllowSourceBinding(),
+	)
+	if err != nil {
+		return nil, toStatus(err)
+	}
+	return &syncv1.FolderRegistration{
+		FolderId:    registration.FolderID,
+		ClientKey:   registration.ClientKey,
+		DisplayName: registration.DisplayName,
+		Role:        toProtoFolderRole(registration.Role),
+		Created:     registration.Created,
+	}, nil
+}
+
 func (s *Server) CreateEnrollment(
 	ctx context.Context,
 	request *syncv1.CreateEnrollmentRequest,

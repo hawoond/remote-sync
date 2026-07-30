@@ -52,6 +52,233 @@ func (p *Postgres) SetDeviceCredential(
 	return nil
 }
 
+func (p *Postgres) EnsureFolder(
+	ctx context.Context,
+	params EnsureFolderParams,
+) (domain.FolderRegistration, error) {
+	var result domain.FolderRegistration
+	err := pgx.BeginFunc(ctx, p.pool, func(tx pgx.Tx) error {
+		var userID string
+		err := tx.QueryRow(ctx, `
+			SELECT d.user_id
+			FROM devices d
+			JOIN users u ON u.id = d.user_id
+			WHERE d.id = $1
+			  AND d.status = 'ACTIVE'
+			  AND u.status = 'ACTIVE'
+		`, params.DeviceID).Scan(&userID)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrPermissionDenied
+		}
+		if err != nil {
+			return fmt.Errorf("authorize folder registration device: %w", err)
+		}
+		if _, err := tx.Exec(ctx, `
+			SELECT 1 FROM users WHERE id = $1 FOR UPDATE
+		`, userID); err != nil {
+			return fmt.Errorf("lock folder owner: %w", err)
+		}
+
+		var sourceRoleName, mode string
+		var canRead, canWrite bool
+		var currentSequence int64
+		err = tx.QueryRow(ctx, `
+			SELECT fd.role, fd.can_read, fd.can_write, f.mode, f.current_sequence
+			FROM folder_devices fd
+			JOIN folders f ON f.id = fd.folder_id
+			WHERE fd.device_id = $1
+			  AND f.id = $2
+			  AND f.owner_user_id = $3
+			  AND f.state = 'ACTIVE'
+			FOR UPDATE OF f
+		`, params.DeviceID, params.SourceFolderID, userID).Scan(
+			&sourceRoleName,
+			&canRead,
+			&canWrite,
+			&mode,
+			&currentSequence,
+		)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrPermissionDenied
+		}
+		if err != nil {
+			return fmt.Errorf("authorize source folder registration: %w", err)
+		}
+		if !canWrite {
+			return ErrPermissionDenied
+		}
+		sourceRole := parseFolderRole(sourceRoleName)
+		if !sourceRole.Valid() {
+			return ErrInvalidState
+		}
+
+		var folderID, displayName, roleName string
+		err = tx.QueryRow(ctx, `
+			SELECT f.id, f.display_name, fd.role
+			FROM folders f
+			JOIN folder_devices fd
+			  ON fd.folder_id = f.id AND fd.device_id = $2
+			WHERE f.owner_user_id = $1
+			  AND f.client_key = $3
+			  AND f.state = 'ACTIVE'
+			  AND fd.can_write
+			FOR UPDATE OF f
+		`, userID, params.DeviceID, params.ClientKey).Scan(
+			&folderID,
+			&displayName,
+			&roleName,
+		)
+		switch {
+		case err == nil:
+			role := parseFolderRole(roleName)
+			if !role.Valid() {
+				return ErrInvalidState
+			}
+			result = domain.FolderRegistration{
+				FolderID:    folderID,
+				ClientKey:   params.ClientKey,
+				DisplayName: displayName,
+				Role:        role,
+			}
+			return nil
+		case !errors.Is(err, pgx.ErrNoRows):
+			return fmt.Errorf("find registered folder: %w", err)
+		}
+
+		var inaccessible bool
+		if err := tx.QueryRow(ctx, `
+			SELECT EXISTS (
+				SELECT 1
+				FROM folders
+				WHERE owner_user_id = $1 AND client_key = $2
+			)
+		`, userID, params.ClientKey).Scan(&inaccessible); err != nil {
+			return fmt.Errorf("check registered folder access: %w", err)
+		}
+		if inaccessible {
+			return ErrPermissionDenied
+		}
+
+		err = tx.QueryRow(ctx, `
+			UPDATE folders
+			SET client_key = $2, display_name = $3
+			WHERE id = $1
+			  AND client_key IS NULL
+			  AND (current_sequence = 0 OR $4)
+			RETURNING id
+		`,
+			params.SourceFolderID,
+			params.ClientKey,
+			params.DisplayName,
+			params.AllowSourceBinding,
+		).Scan(&folderID)
+		if err == nil {
+			result = domain.FolderRegistration{
+				FolderID:    folderID,
+				ClientKey:   params.ClientKey,
+				DisplayName: params.DisplayName,
+				Role:        sourceRole,
+			}
+			return auditFolderRegistration(ctx, tx, params.DeviceID, result, false)
+		}
+		if !errors.Is(err, pgx.ErrNoRows) {
+			return fmt.Errorf("bind source folder: %w", err)
+		}
+
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO folders (
+				id, owner_user_id, mode, state, display_name, client_key
+			) VALUES ($1, $2, $3, 'ACTIVE', $4, $5)
+		`,
+			params.ID,
+			userID,
+			mode,
+			params.DisplayName,
+			params.ClientKey,
+		); err != nil {
+			return fmt.Errorf("create registered folder: %w", err)
+		}
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO folder_devices (
+				folder_id, device_id, role, can_read, can_write
+			) VALUES ($1, $2, $3, $4, $5)
+		`,
+			params.ID,
+			params.DeviceID,
+			sourceRole.String(),
+			canRead,
+			canWrite,
+		); err != nil {
+			return fmt.Errorf("grant registered folder access: %w", err)
+		}
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO device_cursors (folder_id, device_id, acked_sequence)
+			VALUES ($1, $2, 0)
+		`, params.ID, params.DeviceID); err != nil {
+			return fmt.Errorf("initialize registered folder cursor: %w", err)
+		}
+		tag, err := tx.Exec(ctx, `
+			INSERT INTO folder_policies (
+				folder_id, safety_window_seconds, gc_grace_period_seconds
+			)
+			SELECT $1, safety_window_seconds, gc_grace_period_seconds
+			FROM folder_policies
+			WHERE folder_id = $2
+		`, params.ID, params.SourceFolderID)
+		if err != nil {
+			return fmt.Errorf("initialize registered folder policy: %w", err)
+		}
+		if tag.RowsAffected() != 1 {
+			return ErrInvalidState
+		}
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO quota_usages (scope_type, scope_id)
+			VALUES ('FOLDER', $1)
+		`, params.ID); err != nil {
+			return fmt.Errorf("initialize registered folder quota: %w", err)
+		}
+		result = domain.FolderRegistration{
+			FolderID:    params.ID,
+			ClientKey:   params.ClientKey,
+			DisplayName: params.DisplayName,
+			Role:        sourceRole,
+			Created:     true,
+		}
+		return auditFolderRegistration(ctx, tx, params.DeviceID, result, true)
+	})
+	return result, err
+}
+
+func auditFolderRegistration(
+	ctx context.Context,
+	tx pgx.Tx,
+	deviceID string,
+	registration domain.FolderRegistration,
+	created bool,
+) error {
+	if _, err := tx.Exec(ctx, `
+		INSERT INTO audit_logs (
+			actor_type, actor_id, action, folder_id, device_id, metadata
+		) VALUES (
+			'DEVICE', $1, 'FOLDER_REGISTERED', $2, $1,
+			jsonb_build_object(
+				'client_key', $3::text,
+				'display_name', $4::text,
+				'created', $5::boolean
+			)
+		)
+	`,
+		deviceID,
+		registration.FolderID,
+		registration.ClientKey,
+		registration.DisplayName,
+		created,
+	); err != nil {
+		return fmt.Errorf("audit folder registration: %w", err)
+	}
+	return nil
+}
+
 func (p *Postgres) CreateEnrollment(ctx context.Context, params CreateEnrollmentParams) error {
 	return pgx.BeginFunc(ctx, p.pool, func(tx pgx.Tx) error {
 		userID, err := restoreAdminUser(ctx, tx, params.CreatorDeviceID, params.FolderID)

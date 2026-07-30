@@ -27,6 +27,7 @@ const (
 	SyncService_Download_FullMethodName           = "/sync.v1.SyncService/Download"
 	SyncService_ListChanges_FullMethodName        = "/sync.v1.SyncService/ListChanges"
 	SyncService_AckChanges_FullMethodName         = "/sync.v1.SyncService/AckChanges"
+	SyncService_EnsureFolder_FullMethodName       = "/sync.v1.SyncService/EnsureFolder"
 	SyncService_CreateEnrollment_FullMethodName   = "/sync.v1.SyncService/CreateEnrollment"
 	SyncService_EnrollDevice_FullMethodName       = "/sync.v1.SyncService/EnrollDevice"
 	SyncService_GetFolderPolicy_FullMethodName    = "/sync.v1.SyncService/GetFolderPolicy"
@@ -48,6 +49,7 @@ type SyncServiceClient interface {
 	Download(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadChunk], error)
 	ListChanges(ctx context.Context, in *ListChangesRequest, opts ...grpc.CallOption) (*ListChangesResponse, error)
 	AckChanges(ctx context.Context, in *AckChangesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	EnsureFolder(ctx context.Context, in *EnsureFolderRequest, opts ...grpc.CallOption) (*FolderRegistration, error)
 	CreateEnrollment(ctx context.Context, in *CreateEnrollmentRequest, opts ...grpc.CallOption) (*CreateEnrollmentResponse, error)
 	EnrollDevice(ctx context.Context, in *EnrollDeviceRequest, opts ...grpc.CallOption) (*EnrollDeviceResponse, error)
 	GetFolderPolicy(ctx context.Context, in *GetFolderPolicyRequest, opts ...grpc.CallOption) (*FolderPolicy, error)
@@ -151,6 +153,16 @@ func (c *syncServiceClient) AckChanges(ctx context.Context, in *AckChangesReques
 	return out, nil
 }
 
+func (c *syncServiceClient) EnsureFolder(ctx context.Context, in *EnsureFolderRequest, opts ...grpc.CallOption) (*FolderRegistration, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FolderRegistration)
+	err := c.cc.Invoke(ctx, SyncService_EnsureFolder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *syncServiceClient) CreateEnrollment(ctx context.Context, in *CreateEnrollmentRequest, opts ...grpc.CallOption) (*CreateEnrollmentResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateEnrollmentResponse)
@@ -242,6 +254,7 @@ type SyncServiceServer interface {
 	Download(*DownloadRequest, grpc.ServerStreamingServer[DownloadChunk]) error
 	ListChanges(context.Context, *ListChangesRequest) (*ListChangesResponse, error)
 	AckChanges(context.Context, *AckChangesRequest) (*emptypb.Empty, error)
+	EnsureFolder(context.Context, *EnsureFolderRequest) (*FolderRegistration, error)
 	CreateEnrollment(context.Context, *CreateEnrollmentRequest) (*CreateEnrollmentResponse, error)
 	EnrollDevice(context.Context, *EnrollDeviceRequest) (*EnrollDeviceResponse, error)
 	GetFolderPolicy(context.Context, *GetFolderPolicyRequest) (*FolderPolicy, error)
@@ -280,6 +293,9 @@ func (UnimplementedSyncServiceServer) ListChanges(context.Context, *ListChangesR
 }
 func (UnimplementedSyncServiceServer) AckChanges(context.Context, *AckChangesRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method AckChanges not implemented")
+}
+func (UnimplementedSyncServiceServer) EnsureFolder(context.Context, *EnsureFolderRequest) (*FolderRegistration, error) {
+	return nil, status.Error(codes.Unimplemented, "method EnsureFolder not implemented")
 }
 func (UnimplementedSyncServiceServer) CreateEnrollment(context.Context, *CreateEnrollmentRequest) (*CreateEnrollmentResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateEnrollment not implemented")
@@ -419,6 +435,24 @@ func _SyncService_AckChanges_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SyncServiceServer).AckChanges(ctx, req.(*AckChangesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncService_EnsureFolder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnsureFolderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).EnsureFolder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_EnsureFolder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).EnsureFolder(ctx, req.(*EnsureFolderRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -589,6 +623,10 @@ var SyncService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AckChanges",
 			Handler:    _SyncService_AckChanges_Handler,
+		},
+		{
+			MethodName: "EnsureFolder",
+			Handler:    _SyncService_EnsureFolder_Handler,
 		},
 		{
 			MethodName: "CreateEnrollment",

@@ -14,8 +14,8 @@ Remote Sync has two separate runtime roles:
     central location.
 
   Client computer
-    Runs sync-agent for one selected Codex or Claude worktree. Run one agent
-    for each computer that needs backup.
+    Runs one sync-agent for all Codex or Claude worktrees selected on that
+    computer. Run one agent for each computer that needs backup.
 
 Every release archive contains all three programs:
 
@@ -116,7 +116,8 @@ A normal user needs these values:
     A secret credential for this computer only.
 
   SYNC_FOLDER_ID
-    The server folder whose history this client updates.
+    The authorized starting folder. The server assigns an independent remote
+    folder to every local folder you select.
 
 Do not copy one computer's SYNC_DEVICE_TOKEN to another computer. Every
 computer must be enrolled as a separate device. If a token is exposed, ask the
@@ -138,13 +139,15 @@ server administrator to enroll a replacement device.
      SYNC_DEVICE_TOKEN=your_device_token
      SYNC_FOLDER_ID=your_folder_id
 
-5) Leave SYNC_WORKTREE empty on the first start:
+5) Leave both selection values empty on the first start:
 
      SYNC_WORKTREE=
+     SYNC_WORKTREES=
 
    The program will display discovered Codex and Claude worktrees and require
-   you to choose one. To reuse the same selection later, put its displayed ID
-   or absolute path in SYNC_WORKTREE.
+   you to choose one or more. To reuse one selection later, put its displayed
+   ID or absolute path in SYNC_WORKTREE. For multiple selections, put
+   comma-separated IDs or paths in SYNC_WORKTREES.
 
 6) Keep the following value false for a normal TLS server:
 
@@ -171,8 +174,23 @@ Linux
 
     ./start-remote-sync.sh
 
-When the numbered list appears, enter the worktree number and press Enter.
-Selection is required even when only one worktree is found.
+When the numbered list appears, enter one number, comma-separated numbers,
+ranges such as 1,3-5, or all, then press Enter. Selection is required even when
+only one worktree is found. The program never selects everything
+automatically.
+
+One agent supervises all selected folders. Each receives an independent remote
+history and an independent local SQLite state file. The device must have
+writer permission. If the server is too old, multi-folder startup stops and
+asks for a server upgrade instead of mixing histories.
+
+After startup, list the local-to-remote folder mapping:
+
+  macOS/Linux
+    ./start-remote-sync.sh folders
+
+  Windows
+    "Start Remote Sync.cmd" folders
 
 Remote Sync runs while its terminal window remains open. Press Ctrl+C or close
 the window to stop it. Start the launcher again after restarting the computer.
@@ -224,6 +242,12 @@ Windows PowerShell
 
 Linux terminal
   ./start-remote-sync.sh restore --target "$HOME/remote-sync-restore"
+
+For a secondary synchronized folder, run the folders command first and pass
+the displayed FOLDER_ID:
+
+  ./start-remote-sync.sh restore --folder-id FOLDER_ID \
+    --target "$HOME/remote-sync-restore"
 
 Do not edit files in the target directory until restore completes. If it
 fails, leave the target directory in place and send the displayed error to the
@@ -302,6 +326,10 @@ This preserves the database and backup volumes by default. Do not add
 "Unauthenticated" or "PermissionDenied"
   The device token or folder ID may be incorrect or revoked. Ask the
   administrator to enroll a new device.
+
+"the server must be upgraded before multiple folders can be synchronized"
+  Ask the administrator to install the matching server release and run
+  sync-migrate. Do not force multiple roots into one folder ID.
 
 Certificate errors
   Do not change ALLOW_INSECURE to true as a workaround. Ask whether a TLS

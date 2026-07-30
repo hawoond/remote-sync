@@ -203,6 +203,11 @@ func runRestoreCommand(
 	flags := flag.NewFlagSet("restore", flag.ContinueOnError)
 	flags.SetOutput(errorOutput)
 	target := flags.String("target", "", "destination directory")
+	folderID := flags.String(
+		"folder-id",
+		os.Getenv("SYNC_FOLDER_ID"),
+		"registered remote folder UUID",
+	)
 	sequence := flags.Int64("sequence", 0, "folder sequence; zero uses the latest")
 	overwrite := flags.Bool("overwrite", false, "replace existing regular files")
 	resumeID := flags.String("resume", "", "existing restore job ID")
@@ -215,6 +220,9 @@ func runRestoreCommand(
 	if *sequence < 0 {
 		return errors.New("restore sequence must not be negative")
 	}
+	if _, err := uuid.Parse(*folderID); err != nil {
+		return errors.New("restore folder ID must be a UUID")
+	}
 	if *resumeID != "" {
 		if _, err := uuid.Parse(*resumeID); err != nil {
 			return errors.New("restore resume ID must be a UUID")
@@ -223,10 +231,11 @@ func runRestoreCommand(
 			return errors.New("--resume cannot be combined with --sequence or --overwrite")
 		}
 	}
-	cfg, err := loadConnectionConfig(true, true)
+	cfg, err := loadConnectionConfig(true, false)
 	if err != nil {
 		return err
 	}
+	cfg.folderID = *folderID
 	targetPath, err := filepath.Abs(*target)
 	if err != nil {
 		return fmt.Errorf("resolve restore target: %w", err)
@@ -521,7 +530,7 @@ func loadConnectionConfig(requireToken, requireFolder bool) (connectionConfig, e
 }
 
 func openCommandClient(cfg connectionConfig) (*grpcclient.Client, error) {
-	tlsConfig, err := clientTLSConfig(config{
+	tlsConfig, err := clientTLSConfig(sharedConfig{
 		tlsServerName: cfg.tlsServerName,
 		tlsCAFile:     cfg.tlsCAFile,
 		allowInsecure: cfg.allowInsecure,

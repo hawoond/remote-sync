@@ -123,6 +123,88 @@ func TestUploadCommitOverGRPC(t *testing.T) {
 	}
 	defer client.Close()
 
+	primaryFolder, err := client.EnsureFolder(
+		ctx,
+		folderID,
+		"root:v1:"+strings.Repeat("a", 64),
+		"primary worktree",
+		false,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if primaryFolder.FolderID != folderID || primaryFolder.Created {
+		t.Fatalf("primary folder registration = %+v", primaryFolder)
+	}
+	secondaryFolder, err := client.EnsureFolder(
+		ctx,
+		folderID,
+		"root:v1:"+strings.Repeat("b", 64),
+		"secondary worktree",
+		false,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if secondaryFolder.FolderID == folderID || !secondaryFolder.Created {
+		t.Fatalf("secondary folder registration = %+v", secondaryFolder)
+	}
+	replayedFolder, err := client.EnsureFolder(
+		ctx,
+		folderID,
+		secondaryFolder.ClientKey,
+		"renamed locally",
+		false,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if replayedFolder.FolderID != secondaryFolder.FolderID || replayedFolder.Created {
+		t.Fatalf("replayed folder registration = %+v", replayedFolder)
+	}
+
+	legacyFolderID := uuid.NewString()
+	if err := store.BootstrapDevelopment(
+		ctx,
+		userID,
+		deviceID,
+		legacyFolderID,
+		credentialDigest,
+	); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := pool.Exec(ctx, `
+		UPDATE folders SET current_sequence = 1 WHERE id = $1
+	`, legacyFolderID); err != nil {
+		t.Fatal(err)
+	}
+	unclaimedLegacy, err := client.EnsureFolder(
+		ctx,
+		legacyFolderID,
+		"root:v1:"+strings.Repeat("d", 64),
+		"unknown legacy root",
+		false,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if unclaimedLegacy.FolderID == legacyFolderID || !unclaimedLegacy.Created {
+		t.Fatalf("unclaimed legacy registration = %+v", unclaimedLegacy)
+	}
+	claimedLegacy, err := client.EnsureFolder(
+		ctx,
+		legacyFolderID,
+		"root:v1:"+strings.Repeat("e", 64),
+		"known legacy root",
+		true,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if claimedLegacy.FolderID != legacyFolderID || claimedLegacy.Created {
+		t.Fatalf("claimed legacy registration = %+v", claimedLegacy)
+	}
+
 	content := []byte("grpc integration " + userID)
 	sum := sha256.Sum256(content)
 	operation := localdb.Operation{
@@ -253,6 +335,45 @@ func TestUploadCommitOverGRPC(t *testing.T) {
 		`{}`,
 	); status.Code(err) != codes.FailedPrecondition {
 		t.Fatalf("enrollment replay status = %v, want FailedPrecondition", status.Code(err))
+	}
+
+	readerEnrollment, err := client.CreateEnrollment(
+		ctx,
+		folderID,
+		domain.FolderRoleReader,
+		10*time.Minute,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	readerCredentials, err := enrollmentClient.EnrollDevice(
+		ctx,
+		readerEnrollment.Token,
+		"reader-device",
+		"test",
+		`{}`,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	readerClient, err := grpcclient.New(
+		listener.Addr().String(),
+		readerCredentials.DeviceToken,
+		nil,
+		true,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer readerClient.Close()
+	if _, err := readerClient.EnsureFolder(
+		ctx,
+		folderID,
+		"root:v1:"+strings.Repeat("c", 64),
+		"reader folder",
+		false,
+	); status.Code(err) != codes.PermissionDenied {
+		t.Fatalf("reader folder registration status = %v, want PermissionDenied", status.Code(err))
 	}
 
 	restoreClient, err := grpcclient.New(

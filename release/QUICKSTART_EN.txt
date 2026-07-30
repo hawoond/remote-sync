@@ -41,10 +41,12 @@ Windows:
 Linux:
   Run ./start-remote-sync.sh from a terminal.
 
-When SYNC_WORKTREE is empty, the agent finds Codex and Claude Git worktrees and
-shows a numbered list. Choose the folder you want to back up. To use the same
-folder on later starts without another prompt, put the selected ID or absolute
-path in SYNC_WORKTREE inside remote-sync.env.
+When SYNC_WORKTREE and SYNC_WORKTREES are empty, the agent finds Codex and
+Claude Git worktrees and shows a numbered list. Enter one number,
+comma-separated numbers, ranges such as 1,3-5, or all. Every selected folder
+gets an independent remote history. To reuse multiple selections without
+another prompt, put their comma-separated IDs or absolute paths in
+SYNC_WORKTREES inside remote-sync.env.
 
 Stop the agent with Ctrl+C or by closing its terminal window.
 
@@ -54,6 +56,7 @@ Pass a command to the launcher, for example:
 
   ./start-remote-sync.sh --version
   ./start-remote-sync.sh discover
+  ./start-remote-sync.sh folders
   ./start-remote-sync.sh restore --target /path/to/restore
 
 On Windows, replace ./start-remote-sync.sh with "Start Remote Sync.cmd".

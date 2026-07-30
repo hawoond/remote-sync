@@ -12,6 +12,30 @@ import (
 	"github.com/hawoond/remote-sync/internal/domain"
 )
 
+func (c *Client) EnsureFolder(
+	ctx context.Context,
+	sourceFolderID, clientKey, displayName string,
+	allowSourceBinding bool,
+) (domain.FolderRegistration, error) {
+	ctx = auth.OutgoingContext(ctx, c.token)
+	response, err := c.client.EnsureFolder(ctx, &syncv1.EnsureFolderRequest{
+		SourceFolderId:     sourceFolderID,
+		ClientKey:          clientKey,
+		DisplayName:        displayName,
+		AllowSourceBinding: allowSourceBinding,
+	})
+	if err != nil {
+		return domain.FolderRegistration{}, err
+	}
+	return domain.FolderRegistration{
+		FolderID:    response.GetFolderId(),
+		ClientKey:   response.GetClientKey(),
+		DisplayName: response.GetDisplayName(),
+		Role:        fromProtoFolderRole(response.GetRole()),
+		Created:     response.GetCreated(),
+	}, nil
+}
+
 func (c *Client) CreateEnrollment(
 	ctx context.Context,
 	folderID string,

@@ -4,14 +4,15 @@
 
 ## English
 
-Remote Sync backs up a selected local folder or Git worktree to a central
+Remote Sync backs up user-selected local folders or Git worktrees to a central
 server. It is designed for durable whole-file uploads, immutable versions,
 resumable transfers, and recovery after process or network failures.
 
 ### Architecture
 
-- `sync-agent` discovers or accepts a sync root, scans and watches it, persists
-  pending work in SQLite, and uploads stable file snapshots.
+- `sync-agent` discovers or accepts one or more sync roots, scans and watches
+  them, persists isolated pending work in SQLite, and uploads stable file
+  snapshots.
 - `sync-server` validates paths and limits, stores metadata in PostgreSQL, and
   promotes verified content into an immutable local blob store.
 - gRPC carries control messages and chunked file transfers.
@@ -50,7 +51,8 @@ After extracting the archive:
    address, device token, and folder ID supplied by the server administrator.
 4. Start `Start Remote Sync.command` on macOS, `Start Remote Sync.cmd` on
    Windows, or `start-remote-sync.sh` on Linux.
-5. Choose a discovered Codex or Claude worktree from the numbered list.
+5. Choose one or more discovered Codex or Claude worktrees from the numbered
+   list.
 
 Each archive is a combined distribution: normal users run `sync-agent`, while
 administrators use the included `sync-server`, `sync-migrate`, and migrations.
@@ -205,12 +207,15 @@ not Git worktrees are omitted.
 
 ### Interactive selection is mandatory
 
-When `SYNC_ROOT` and `SYNC_WORKTREE` are both unset, `sync-agent` discovers all
-available Codex and Claude worktrees and asks the user to select one:
+When `SYNC_ROOT`, `SYNC_ROOTS`, `SYNC_WORKTREE`, and `SYNC_WORKTREES` are all
+unset, `sync-agent` discovers every available Codex and Claude worktree and
+asks the user to select one or more:
 
 ```sh
 unset SYNC_ROOT
+unset SYNC_ROOTS
 unset SYNC_WORKTREE
+unset SYNC_WORKTREES
 
 export SYNC_FOLDER_ID='<server-authorized-folder-uuid>'
 export SYNC_DEVICE_TOKEN='<device-token-with-at-least-32-characters>'
@@ -220,32 +225,36 @@ export ALLOW_INSECURE=true
 go run ./cmd/sync-agent
 ```
 
-The prompt always requires a choice, even when only one worktree is found:
+The prompt always requires a choice, even when only one worktree is found.
+Enter comma-separated numbers, ranges, or `all`:
 
 ```text
 #  PROVIDER  REPOSITORY  BRANCH             ID                  PATH
 1  claude    storefront  worktree-checkout  claude:4a90b23c719e /home/alice/storefront/.claude/worktrees/checkout
 2  codex     payments    (detached)          codex:183f2b73a9d1  /home/alice/.codex/worktrees/task-42
-Select a worktree [1-2] or q to cancel:
+3  codex     catalog     feature/search      codex:3904a67af245  /home/alice/.codex/worktrees/catalog-search
+Select worktrees (for example 1,3-5 or all) or q to cancel: 1,3
 ```
 
-The agent never picks the first result automatically.
+The agent never picks the first result or all results automatically. Overlapping
+roots, such as a parent directory and its child, are rejected.
 
 ### Non-interactive selection
 
 A service, CI job, launch daemon, or container normally has no interactive
 terminal. In that case, discovery prints the candidates and exits unless
-`SYNC_WORKTREE` is set to a discovered ID or absolute path:
+`SYNC_WORKTREE` is set for one selection or `SYNC_WORKTREES` is set for
+multiple selections:
 
 ```sh
 export SYNC_WORKTREE='codex:183f2b73a9d1'
 go run ./cmd/sync-agent
 ```
 
-or:
+Multiple IDs or absolute paths use a comma-separated value:
 
 ```sh
-export SYNC_WORKTREE='/home/alice/.codex/worktrees/task-42'
+export SYNC_WORKTREES='claude:4a90b23c719e,codex:183f2b73a9d1'
 go run ./cmd/sync-agent
 ```
 
@@ -254,8 +263,8 @@ IDs are stable for the same provider and canonical path. Run
 
 ### Explicit folder mode
 
-`SYNC_ROOT` remains the highest-priority option and bypasses worktree discovery
-because the path itself is an explicit user choice:
+`SYNC_ROOT` and `SYNC_ROOTS` bypass worktree discovery because their paths are
+explicit user choices:
 
 ```sh
 export SYNC_ROOT='/absolute/path/to/folder'
@@ -264,7 +273,14 @@ unset SYNC_WORKTREE
 go run ./cmd/sync-agent
 ```
 
-The root does not have to be a Git repository in explicit folder mode.
+For multiple ordinary folders, use the operating-system path-list separator:
+
+```sh
+export SYNC_ROOTS='/absolute/path/one:/absolute/path/two'
+```
+
+Use `;` instead of `:` on Windows. Explicit roots do not have to be Git
+repositories.
 
 ### Custom discovery locations
 
@@ -299,18 +315,49 @@ are not reported because Remote Sync validates Git worktrees.
 
 ### Worktree backup behavior
 
-- One `sync-agent` process watches one selected worktree.
-- The default SQLite state database is scoped by both `SYNC_FOLDER_ID` and the
-  canonical selected root, preventing pending operations from another
-  worktree from being reused accidentally.
+- One `sync-agent` process supervises every worktree selected at startup.
+- One startup accepts at most 128 non-overlapping roots.
+- The initially authorized `SYNC_FOLDER_ID` is the registration anchor. The
+  server binds the first selected root to it and creates or reuses a separate
+  remote folder for every additional root. The device needs write access.
+- Folder registration is idempotent: selecting the same canonical root again
+  reuses its remote folder and version history.
+- During an upgrade, an existing per-root SQLite state file identifies which
+  selected root owns prior anchor-folder history. An ambiguous legacy setup is
+  stopped for manual separation instead of guessing.
+- Every selected root receives a separate SQLite state database, preventing
+  pending operations and remote paths from crossing folder boundaries.
 - `.git`, nested `.claude/worktrees`, and nested Git repositories are excluded
   from scanning and filesystem watches.
-- Use a distinct server-authorized `SYNC_FOLDER_ID` for worktrees whose remote
-  histories must remain independent. Reusing a folder ID means the selected
-  worktree is intended to update that same remote folder history.
+- `SYNC_STATE_PATH` is supported for one root only. Use `SYNC_STATE_DIR` to
+  choose the directory that holds automatically named state databases for
+  multiple roots. State databases and the folder map must remain outside every
+  synchronized root.
 - Deleting or archiving a worktree while the agent is running makes the root
-  unavailable. The agent stops instead of treating the missing root as a mass
-  deletion.
+  unavailable. The supervisor stops safely instead of treating the missing
+  root as a mass deletion.
+
+The server must include the `EnsureFolder` API and migration
+`000003_folder_registration.sql` for multi-folder startup. A newer agent falls
+back to the previous single-folder behavior when an older server returns
+`Unimplemented`, but it refuses a multi-folder start until the server is
+upgraded and `sync-migrate` has run.
+
+After the first successful start, inspect the local root-to-folder mapping:
+
+```sh
+./bin/sync-agent folders
+./bin/sync-agent folders --json
+```
+
+The map is stored with mode `0600` under `SYNC_STATE_DIR`. To restore a
+secondary folder, copy its `FOLDER_ID` from this command:
+
+```sh
+./bin/sync-agent restore \
+  --folder-id '<registered-folder-uuid>' \
+  --target /absolute/path/to/restore
+```
 
 ### Enroll another device
 
@@ -455,14 +502,18 @@ Agent variables:
 
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
-| `SYNC_FOLDER_ID` | Yes | — | Server-authorized folder UUID |
+| `SYNC_FOLDER_ID` | Yes | — | Server-authorized anchor folder UUID |
 | `SYNC_DEVICE_TOKEN` | Yes | — | Device bearer token, at least 32 characters |
 | `SYNC_ENROLLMENT_TOKEN` | Enrollment only | — | One-time token consumed by `sync-agent enroll` |
 | `SYNC_ROOT` | No | — | Explicit root; bypasses discovery |
+| `SYNC_ROOTS` | No | — | Explicit OS path list for multiple ordinary folders |
 | `SYNC_WORKTREE` | Non-interactive discovery | — | Discovered ID or absolute path |
+| `SYNC_WORKTREES` | Non-interactive discovery | — | Comma-separated IDs or paths for multiple worktrees |
 | `SYNC_WORKTREE_PROVIDERS` | No | `all` | Provider filter |
 | `SYNC_SERVER_ADDRESS` | No | `127.0.0.1:8443` | gRPC server address |
-| `SYNC_STATE_PATH` | No | OS config directory | Explicit SQLite state path |
+| `SYNC_STATE_PATH` | Single folder only | — | Explicit SQLite state file |
+| `SYNC_STATE_DIR` | No | OS config directory | State database directory for all selected folders |
+| `SYNC_FOLDER_MAP_PATH` | No | Under `SYNC_STATE_DIR` | Local root-to-folder map path |
 | `SCAN_INTERVAL` | No | `15m` | Full scan interval |
 | `WATCH_DEBOUNCE` | No | `500ms` | Filesystem event debounce |
 | `TLS_CA_FILE` | No | System trust store | Private CA bundle |
@@ -476,14 +527,15 @@ before starting a server version that requires a new schema.
 
 ## 한국어
 
-Remote Sync는 사용자가 선택한 로컬 폴더 또는 Git worktree를 중앙 서버에
+Remote Sync는 사용자가 선택한 여러 로컬 폴더 또는 Git worktree를 중앙 서버에
 백업합니다. 전체 파일 단위의 내구성 있는 업로드, 불변 버전, 전송 재개,
 프로세스·네트워크 장애 후 복구를 목표로 합니다.
 
 ### 구성
 
-- `sync-agent`는 동기화 루트를 탐지하거나 명시적으로 전달받고, 파일을
-  스캔·감시하며, SQLite에 작업을 보존한 뒤 안정된 파일 스냅샷을 업로드합니다.
+- `sync-agent`는 하나 이상의 동기화 루트를 탐지하거나 명시적으로 전달받고,
+  파일을 스캔·감시하며, 격리된 SQLite 작업을 보존한 뒤 안정된 파일
+  스냅샷을 업로드합니다.
 - `sync-server`는 경로와 용량 제한을 검증하고 PostgreSQL에 메타데이터를
   저장하며, 검증된 콘텐츠를 불변 로컬 Blob Store로 승격합니다.
 - gRPC가 제어 메시지와 청크 파일 전송을 담당합니다.
@@ -521,7 +573,7 @@ Remote Sync는 사용자가 선택한 로컬 폴더 또는 Git worktree를 중�
    전달한 서버 주소, 기기 토큰, 폴더 ID를 입력합니다.
 4. macOS는 `Start Remote Sync.command`, Windows는 `Start Remote Sync.cmd`,
    Linux는 `start-remote-sync.sh`를 실행합니다.
-5. 번호 목록에서 Codex 또는 Claude worktree를 직접 선택합니다.
+5. 번호 목록에서 Codex 또는 Claude worktree를 하나 이상 직접 선택합니다.
 
 각 압축 파일은 통합 배포본입니다. 일반 사용자는 `sync-agent`를 실행하고,
 관리자는 같은 파일에 포함된 `sync-server`, `sync-migrate`, migrations를
@@ -672,12 +724,15 @@ go run ./cmd/sync-agent discover --json
 
 ### 사용자가 반드시 선택
 
-`SYNC_ROOT`와 `SYNC_WORKTREE`가 모두 없으면 `sync-agent`가 Codex·Claude
-worktree를 찾은 뒤 번호 목록을 보여줍니다.
+`SYNC_ROOT`, `SYNC_ROOTS`, `SYNC_WORKTREE`, `SYNC_WORKTREES`가 모두 없으면
+`sync-agent`가 Codex·Claude worktree를 찾은 뒤 하나 이상 선택할 수 있는 번호
+목록을 보여줍니다.
 
 ```sh
 unset SYNC_ROOT
+unset SYNC_ROOTS
 unset SYNC_WORKTREE
+unset SYNC_WORKTREES
 
 export SYNC_FOLDER_ID='<서버에서 허용한 폴더 UUID>'
 export SYNC_DEVICE_TOKEN='<32자 이상의 기기 토큰>'
@@ -687,32 +742,35 @@ export ALLOW_INSECURE=true
 go run ./cmd/sync-agent
 ```
 
-발견한 worktree가 하나뿐이어도 사용자가 번호를 입력해야 합니다.
+발견한 worktree가 하나뿐이어도 사용자가 번호를 입력해야 합니다. 쉼표로
+구분한 번호, 범위 또는 `all`을 입력할 수 있습니다.
 
 ```text
 #  PROVIDER  REPOSITORY  BRANCH             ID                  PATH
 1  claude    storefront  worktree-checkout  claude:4a90b23c719e /home/alice/storefront/.claude/worktrees/checkout
 2  codex     payments    (detached)          codex:183f2b73a9d1  /home/alice/.codex/worktrees/task-42
-Select a worktree [1-2] or q to cancel:
+3  codex     catalog     feature/search      codex:3904a67af245  /home/alice/.codex/worktrees/catalog-search
+Select worktrees (for example 1,3-5 or all) or q to cancel: 1,3
 ```
 
-첫 번째 항목을 임의로 고르는 동작은 없습니다.
+첫 번째 항목이나 전체 항목을 임의로 고르는 동작은 없습니다. 상위 폴더와 그
+하위 폴더처럼 서로 겹치는 루트는 중복 동기화를 막기 위해 거부합니다.
 
 ### 비대화형 실행
 
 서비스, CI, launch daemon, 컨테이너처럼 터미널 입력이 없는 환경에서는
-탐지 목록을 출력한 뒤 종료합니다. 이때는 `SYNC_WORKTREE`에 탐지 ID 또는 절대
-경로를 지정해야 합니다.
+탐지 목록을 출력한 뒤 종료합니다. 하나는 `SYNC_WORKTREE`, 여러 개는
+`SYNC_WORKTREES`에 지정해야 합니다.
 
 ```sh
 export SYNC_WORKTREE='codex:183f2b73a9d1'
 go run ./cmd/sync-agent
 ```
 
-또는:
+여러 탐지 ID 또는 절대 경로는 쉼표로 구분합니다.
 
 ```sh
-export SYNC_WORKTREE='/home/alice/.codex/worktrees/task-42'
+export SYNC_WORKTREES='claude:4a90b23c719e,codex:183f2b73a9d1'
 go run ./cmd/sync-agent
 ```
 
@@ -721,7 +779,7 @@ ID는 제공자와 정규화된 경로가 같으면 안정적으로 유지됩니
 
 ### 명시적 폴더 모드
 
-`SYNC_ROOT`는 최우선 설정입니다. 경로 자체가 사용자의 명시적 선택이므로
+`SYNC_ROOT`와 `SYNC_ROOTS`는 경로 자체가 사용자의 명시적 선택이므로
 worktree 탐지를 건너뜁니다.
 
 ```sh
@@ -731,7 +789,14 @@ unset SYNC_WORKTREE
 go run ./cmd/sync-agent
 ```
 
-명시적 폴더 모드에서는 Git 저장소가 아닌 일반 디렉터리도 사용할 수 있습니다.
+일반 폴더 여러 개는 운영체제 경로 목록 구분자를 사용합니다.
+
+```sh
+export SYNC_ROOTS='/absolute/path/one:/absolute/path/two'
+```
+
+Windows에서는 `:` 대신 `;`를 사용합니다. 명시적 폴더 모드에서는 Git
+저장소가 아닌 일반 디렉터리도 사용할 수 있습니다.
 
 ### 사용자 지정 탐지 위치
 
@@ -766,16 +831,48 @@ $env:SYNC_DISCOVERY_PROJECT_ROOTS = 'D:\Projects\Storefront;D:\Projects\Payments
 
 ### Worktree 백업 동작
 
-- `sync-agent` 프로세스 하나는 사용자가 선택한 worktree 하나만 감시합니다.
-- 기본 SQLite 상태 DB는 `SYNC_FOLDER_ID`와 정규화된 선택 루트에 함께
-  종속됩니다. 다른 worktree의 미완료 작업을 실수로 재사용하지 않습니다.
+- `sync-agent` 프로세스 하나가 시작할 때 선택한 모든 worktree를 함께
+  감독합니다.
+- 한 번 실행할 때 서로 겹치지 않는 루트를 최대 128개까지 선택할 수 있습니다.
+- 최초에 허용된 `SYNC_FOLDER_ID`는 등록 기준 폴더입니다. 서버가 첫 번째 선택
+  루트를 여기에 연결하고, 추가 루트마다 독립된 원격 폴더를 생성하거나 기존
+  폴더를 재사용합니다. 기기에는 쓰기 권한이 필요합니다.
+- 폴더 등록은 멱등적입니다. 같은 정규화 루트를 다시 선택하면 기존 원격 폴더와
+  버전 이력을 재사용합니다.
+- 업그레이드 시 기존 루트별 SQLite 상태 파일로 과거 등록 기준 폴더 이력의
+  소유 루트를 확인합니다. 모호한 기존 설정은 임의로 추측하지 않고 수동 분리를
+  위해 중단합니다.
+- 선택한 루트마다 별도 SQLite 상태 DB를 사용하므로 미완료 작업과 원격 경로가
+  다른 폴더 경계를 넘지 않습니다.
 - `.git`, 중첩된 `.claude/worktrees`, 중첩 Git 저장소는 스캔과 파일 감시에서
   제외합니다.
-- 원격 이력을 독립적으로 보존할 worktree마다 서버에서 허용된 별도
-  `SYNC_FOLDER_ID`를 사용하세요. 같은 폴더 ID를 다시 사용하면 같은 원격 폴더
-  이력을 갱신하려는 의도로 처리됩니다.
+- `SYNC_STATE_PATH`는 루트 하나일 때만 사용할 수 있습니다. 여러 루트의 자동
+  상태 DB가 저장될 디렉터리를 바꾸려면 `SYNC_STATE_DIR`을 사용합니다. 상태
+  DB와 폴더 매핑 파일은 모든 동기화 루트 밖에 있어야 합니다.
 - 에이전트 실행 중 worktree를 삭제하거나 보관해 루트가 사라지면 대량 삭제로
-  간주하지 않고 에이전트가 중단됩니다.
+  간주하지 않고 감독 프로세스가 안전하게 중단됩니다.
+
+다중 폴더를 사용하려면 서버에 `EnsureFolder` API와
+`000003_folder_registration.sql` 마이그레이션이 있어야 합니다. 새 에이전트가
+구버전 서버에서 `Unimplemented` 응답을 받으면 단일 폴더 모드만 이전 방식으로
+실행하고, 여러 폴더는 서버 업그레이드와 `sync-migrate` 실행 전까지 시작하지
+않습니다.
+
+첫 실행에 성공한 뒤 로컬 루트와 원격 폴더의 연결을 확인할 수 있습니다.
+
+```sh
+./bin/sync-agent folders
+./bin/sync-agent folders --json
+```
+
+매핑 파일은 `SYNC_STATE_DIR` 아래에 `0600` 권한으로 저장됩니다. 추가 폴더를
+복원할 때는 이 명령에 표시된 `FOLDER_ID`를 사용합니다.
+
+```sh
+./bin/sync-agent restore \
+  --folder-id '<등록된-폴더-UUID>' \
+  --target /absolute/path/to/restore
+```
 
 ### 다른 기기 등록
 
@@ -917,14 +1014,18 @@ Docker 설정 변수:
 
 | 변수 | 필수 | 기본값 | 설명 |
 | --- | --- | --- | --- |
-| `SYNC_FOLDER_ID` | 필수 | — | 서버에서 허용한 폴더 UUID |
+| `SYNC_FOLDER_ID` | 필수 | — | 서버에서 허용한 등록 기준 폴더 UUID |
 | `SYNC_DEVICE_TOKEN` | 필수 | — | 32자 이상의 기기 Bearer 토큰 |
 | `SYNC_ENROLLMENT_TOKEN` | 기기 등록 시 | — | `sync-agent enroll`이 소비할 일회용 토큰 |
 | `SYNC_ROOT` | 선택 | — | 명시적 루트, 탐지 생략 |
+| `SYNC_ROOTS` | 선택 | — | 일반 폴더 여러 개의 운영체제 경로 목록 |
 | `SYNC_WORKTREE` | 비대화형 탐지 시 | — | 탐지 ID 또는 절대 경로 |
+| `SYNC_WORKTREES` | 비대화형 탐지 시 | — | 여러 worktree의 쉼표 구분 ID 또는 경로 |
 | `SYNC_WORKTREE_PROVIDERS` | 선택 | `all` | 제공자 필터 |
 | `SYNC_SERVER_ADDRESS` | 선택 | `127.0.0.1:8443` | gRPC 서버 주소 |
-| `SYNC_STATE_PATH` | 선택 | OS 설정 디렉터리 | SQLite 상태 DB 명시 경로 |
+| `SYNC_STATE_PATH` | 단일 폴더만 | — | SQLite 상태 DB 명시 경로 |
+| `SYNC_STATE_DIR` | 선택 | OS 설정 디렉터리 | 선택한 모든 폴더의 상태 DB 디렉터리 |
+| `SYNC_FOLDER_MAP_PATH` | 선택 | `SYNC_STATE_DIR` 아래 | 로컬 루트와 원격 폴더 매핑 파일 |
 | `SCAN_INTERVAL` | 선택 | `15m` | 전체 스캔 주기 |
 | `WATCH_DEBOUNCE` | 선택 | `500ms` | 파일 이벤트 디바운스 |
 | `TLS_CA_FILE` | 선택 | 시스템 신뢰 저장소 | 사설 CA 번들 |

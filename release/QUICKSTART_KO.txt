@@ -41,9 +41,11 @@ Windows:
 Linux:
   터미널에서 ./start-remote-sync.sh를 실행합니다.
 
-SYNC_WORKTREE가 비어 있으면 Codex와 Claude의 Git worktree를 찾아 번호 목록으로
-보여줍니다. 백업할 폴더를 직접 선택하세요. 다음 실행부터 묻지 않게 하려면
-선택 결과의 ID 또는 절대 경로를 remote-sync.env의 SYNC_WORKTREE에 입력합니다.
+SYNC_WORKTREE와 SYNC_WORKTREES가 비어 있으면 Codex와 Claude의 Git worktree를
+찾아 번호 목록으로 보여줍니다. 번호 하나, 쉼표로 구분한 여러 번호, `1,3-5`
+같은 범위 또는 `all`을 입력하세요. 선택한 각 폴더는 독립된 원격 이력을
+사용합니다. 다음 실행부터 묻지 않게 하려면 여러 선택 결과의 ID 또는 절대
+경로를 쉼표로 구분해 remote-sync.env의 SYNC_WORKTREES에 입력합니다.
 
 Ctrl+C를 누르거나 터미널 창을 닫으면 에이전트가 종료됩니다.
 
@@ -53,6 +55,7 @@ Ctrl+C를 누르거나 터미널 창을 닫으면 에이전트가 종료됩니�
 
   ./start-remote-sync.sh --version
   ./start-remote-sync.sh discover
+  ./start-remote-sync.sh folders
   ./start-remote-sync.sh restore --target /path/to/restore
 
 Windows에서는 ./start-remote-sync.sh 대신 "Start Remote Sync.cmd"를 사용합니다.

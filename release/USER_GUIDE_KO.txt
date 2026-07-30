@@ -13,8 +13,8 @@ Remote Sync는 서버와 클라이언트가 함께 동작합니다.
     파일 이력과 백업 데이터를 보관합니다. 한 곳에서 계속 실행합니다.
 
   클라이언트 컴퓨터
-    Codex 또는 Claude worktree를 선택하고 서버로 백업합니다.
-    백업할 컴퓨터마다 sync-agent를 하나씩 실행합니다.
+    이 컴퓨터에서 선택한 모든 Codex 또는 Claude worktree를 sync-agent 하나로
+    서버에 백업합니다. 백업할 컴퓨터마다 에이전트 하나를 실행합니다.
 
 릴리즈 압축 파일 하나에는 아래 프로그램이 모두 들어 있습니다.
 
@@ -115,7 +115,8 @@ Mac 종류는 Apple 메뉴 > 이 Mac에 관하여의 칩 또는 프로세서 항
     이 컴퓨터만 사용하는 비밀 인증 값입니다.
 
   SYNC_FOLDER_ID
-    백업 이력이 저장될 서버 폴더 ID입니다.
+    서버에서 허용한 시작 폴더 ID입니다. 선택한 로컬 폴더마다 서버가 독립된
+    원격 폴더를 배정합니다.
 
 한 컴퓨터의 SYNC_DEVICE_TOKEN을 다른 컴퓨터에 복사하지 마세요. 컴퓨터마다
 별도 기기로 등록해야 합니다. 토큰이 노출되었다면 서버 관리자에게 새 기기
@@ -137,13 +138,15 @@ Mac 종류는 Apple 메뉴 > 이 Mac에 관하여의 칩 또는 프로세서 항
      SYNC_DEVICE_TOKEN=서버에서_받은_기기_토큰
      SYNC_FOLDER_ID=서버에서_받은_폴더_ID
 
-5) SYNC_WORKTREE는 처음에는 비워 둡니다.
+5) 처음에는 두 선택 값을 모두 비워 둡니다.
 
      SYNC_WORKTREE=
+     SYNC_WORKTREES=
 
-   프로그램이 찾은 Codex와 Claude worktree 중 하나를 직접 선택할 수 있습니다.
-   선택한 폴더를 다음에도 사용하려면 나중에 표시된 ID 또는 절대 경로를
-   SYNC_WORKTREE에 저장하세요.
+   프로그램이 찾은 Codex와 Claude worktree 중 하나 이상을 직접 선택할 수
+   있습니다. 하나를 다음에도 사용하려면 표시된 ID 또는 절대 경로를
+   SYNC_WORKTREE에 저장합니다. 여러 개는 쉼표로 구분해 SYNC_WORKTREES에
+   저장합니다.
 
 6) 일반적인 TLS 서버에서는 아래 값을 false로 유지합니다.
 
@@ -170,8 +173,22 @@ Linux
 
     ./start-remote-sync.sh
 
-번호 목록이 나타나면 백업할 worktree 번호를 입력하고 Enter를 누릅니다.
-worktree가 하나뿐이어도 사용자가 직접 선택해야 합니다.
+번호 목록이 나타나면 번호 하나, 쉼표로 구분한 여러 번호, `1,3-5` 같은 범위
+또는 `all`을 입력하고 Enter를 누릅니다. worktree가 하나뿐이어도 사용자가
+직접 선택해야 하며 프로그램이 전체 항목을 자동 선택하지 않습니다.
+
+에이전트 하나가 선택한 모든 폴더를 감독합니다. 각 폴더는 독립된 원격 이력과
+로컬 SQLite 상태 파일을 사용합니다. 기기에는 쓰기 권한이 필요합니다.
+서버가 구버전이면 이력이 섞이지 않도록 다중 폴더 실행을 중단하고 서버
+업그레이드를 요청합니다.
+
+시작 후 로컬 폴더와 원격 폴더의 연결을 확인할 수 있습니다.
+
+  macOS/Linux
+    ./start-remote-sync.sh folders
+
+  Windows
+    "Start Remote Sync.cmd" folders
 
 터미널 창이 열려 있는 동안 Remote Sync가 실행됩니다. Ctrl+C를 누르거나
 창을 닫으면 종료됩니다. 컴퓨터를 다시 시작한 뒤에는 실행 파일을 다시
@@ -225,6 +242,11 @@ Windows PowerShell
 
 Linux 터미널
   ./start-remote-sync.sh restore --target "$HOME/remote-sync-restore"
+
+추가 동기화 폴더는 먼저 folders 명령으로 FOLDER_ID를 확인한 뒤 지정합니다.
+
+  ./start-remote-sync.sh restore --folder-id FOLDER_ID \
+    --target "$HOME/remote-sync-restore"
 
 복원이 끝나기 전에는 대상 폴더의 파일을 수정하지 마세요. 오류가 발생하면
 대상 폴더를 그대로 둔 상태에서 서버 관리자에게 터미널에 표시된 오류 내용을
@@ -303,6 +325,10 @@ ALLOW_INSECURE=true 상태로 서버를 공용 네트워크에 노출하지 마�
 "Unauthenticated", "PermissionDenied"
   기기 토큰 또는 폴더 ID가 잘못되었거나 폐기된 상태일 수 있습니다.
   서버 관리자에게 새 기기 등록을 요청합니다.
+
+"the server must be upgraded before multiple folders can be synchronized"
+  서버 관리자에게 같은 릴리즈의 서버 설치와 sync-migrate 실행을 요청합니다.
+  여러 루트를 폴더 ID 하나에 억지로 합치지 마세요.
 
 인증서 관련 오류
   임의로 ALLOW_INSECURE=true로 바꾸지 말고 서버 관리자에게 TLS 서버 이름이나

@@ -1328,6 +1328,150 @@ func (x *AckChangesRequest) GetSequence() int64 {
 	return 0
 }
 
+type EnsureFolderRequest struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	SourceFolderId     string                 `protobuf:"bytes,1,opt,name=source_folder_id,json=sourceFolderId,proto3" json:"source_folder_id,omitempty"`
+	ClientKey          string                 `protobuf:"bytes,2,opt,name=client_key,json=clientKey,proto3" json:"client_key,omitempty"`
+	DisplayName        string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	AllowSourceBinding bool                   `protobuf:"varint,4,opt,name=allow_source_binding,json=allowSourceBinding,proto3" json:"allow_source_binding,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *EnsureFolderRequest) Reset() {
+	*x = EnsureFolderRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnsureFolderRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnsureFolderRequest) ProtoMessage() {}
+
+func (x *EnsureFolderRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnsureFolderRequest.ProtoReflect.Descriptor instead.
+func (*EnsureFolderRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *EnsureFolderRequest) GetSourceFolderId() string {
+	if x != nil {
+		return x.SourceFolderId
+	}
+	return ""
+}
+
+func (x *EnsureFolderRequest) GetClientKey() string {
+	if x != nil {
+		return x.ClientKey
+	}
+	return ""
+}
+
+func (x *EnsureFolderRequest) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *EnsureFolderRequest) GetAllowSourceBinding() bool {
+	if x != nil {
+		return x.AllowSourceBinding
+	}
+	return false
+}
+
+type FolderRegistration struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FolderId      string                 `protobuf:"bytes,1,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	ClientKey     string                 `protobuf:"bytes,2,opt,name=client_key,json=clientKey,proto3" json:"client_key,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	Role          FolderRole             `protobuf:"varint,4,opt,name=role,proto3,enum=sync.v1.FolderRole" json:"role,omitempty"`
+	Created       bool                   `protobuf:"varint,5,opt,name=created,proto3" json:"created,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FolderRegistration) Reset() {
+	*x = FolderRegistration{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FolderRegistration) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FolderRegistration) ProtoMessage() {}
+
+func (x *FolderRegistration) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FolderRegistration.ProtoReflect.Descriptor instead.
+func (*FolderRegistration) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *FolderRegistration) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *FolderRegistration) GetClientKey() string {
+	if x != nil {
+		return x.ClientKey
+	}
+	return ""
+}
+
+func (x *FolderRegistration) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *FolderRegistration) GetRole() FolderRole {
+	if x != nil {
+		return x.Role
+	}
+	return FolderRole_FOLDER_ROLE_UNSPECIFIED
+}
+
+func (x *FolderRegistration) GetCreated() bool {
+	if x != nil {
+		return x.Created
+	}
+	return false
+}
+
 type CreateEnrollmentRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	FolderId         string                 `protobuf:"bytes,1,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
@@ -1339,7 +1483,7 @@ type CreateEnrollmentRequest struct {
 
 func (x *CreateEnrollmentRequest) Reset() {
 	*x = CreateEnrollmentRequest{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[14]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1351,7 +1495,7 @@ func (x *CreateEnrollmentRequest) String() string {
 func (*CreateEnrollmentRequest) ProtoMessage() {}
 
 func (x *CreateEnrollmentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[14]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1364,7 +1508,7 @@ func (x *CreateEnrollmentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateEnrollmentRequest.ProtoReflect.Descriptor instead.
 func (*CreateEnrollmentRequest) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{14}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CreateEnrollmentRequest) GetFolderId() string {
@@ -1401,7 +1545,7 @@ type CreateEnrollmentResponse struct {
 
 func (x *CreateEnrollmentResponse) Reset() {
 	*x = CreateEnrollmentResponse{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[15]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1413,7 +1557,7 @@ func (x *CreateEnrollmentResponse) String() string {
 func (*CreateEnrollmentResponse) ProtoMessage() {}
 
 func (x *CreateEnrollmentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[15]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1426,7 +1570,7 @@ func (x *CreateEnrollmentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateEnrollmentResponse.ProtoReflect.Descriptor instead.
 func (*CreateEnrollmentResponse) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{15}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *CreateEnrollmentResponse) GetEnrollmentId() string {
@@ -1476,7 +1620,7 @@ type EnrollDeviceRequest struct {
 
 func (x *EnrollDeviceRequest) Reset() {
 	*x = EnrollDeviceRequest{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[16]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1488,7 +1632,7 @@ func (x *EnrollDeviceRequest) String() string {
 func (*EnrollDeviceRequest) ProtoMessage() {}
 
 func (x *EnrollDeviceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[16]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1501,7 +1645,7 @@ func (x *EnrollDeviceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnrollDeviceRequest.ProtoReflect.Descriptor instead.
 func (*EnrollDeviceRequest) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{16}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *EnrollDeviceRequest) GetEnrollmentToken() string {
@@ -1544,7 +1688,7 @@ type EnrollDeviceResponse struct {
 
 func (x *EnrollDeviceResponse) Reset() {
 	*x = EnrollDeviceResponse{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[17]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1556,7 +1700,7 @@ func (x *EnrollDeviceResponse) String() string {
 func (*EnrollDeviceResponse) ProtoMessage() {}
 
 func (x *EnrollDeviceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[17]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1569,7 +1713,7 @@ func (x *EnrollDeviceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EnrollDeviceResponse.ProtoReflect.Descriptor instead.
 func (*EnrollDeviceResponse) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{17}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *EnrollDeviceResponse) GetDeviceId() string {
@@ -1609,7 +1753,7 @@ type GetFolderPolicyRequest struct {
 
 func (x *GetFolderPolicyRequest) Reset() {
 	*x = GetFolderPolicyRequest{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[18]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1621,7 +1765,7 @@ func (x *GetFolderPolicyRequest) String() string {
 func (*GetFolderPolicyRequest) ProtoMessage() {}
 
 func (x *GetFolderPolicyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[18]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1634,7 +1778,7 @@ func (x *GetFolderPolicyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFolderPolicyRequest.ProtoReflect.Descriptor instead.
 func (*GetFolderPolicyRequest) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{18}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GetFolderPolicyRequest) GetFolderId() string {
@@ -1655,7 +1799,7 @@ type UpdateFolderPolicyRequest struct {
 
 func (x *UpdateFolderPolicyRequest) Reset() {
 	*x = UpdateFolderPolicyRequest{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[19]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1667,7 +1811,7 @@ func (x *UpdateFolderPolicyRequest) String() string {
 func (*UpdateFolderPolicyRequest) ProtoMessage() {}
 
 func (x *UpdateFolderPolicyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[19]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1680,7 +1824,7 @@ func (x *UpdateFolderPolicyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateFolderPolicyRequest.ProtoReflect.Descriptor instead.
 func (*UpdateFolderPolicyRequest) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{19}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *UpdateFolderPolicyRequest) GetFolderId() string {
@@ -1717,7 +1861,7 @@ type FolderPolicy struct {
 
 func (x *FolderPolicy) Reset() {
 	*x = FolderPolicy{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[20]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1729,7 +1873,7 @@ func (x *FolderPolicy) String() string {
 func (*FolderPolicy) ProtoMessage() {}
 
 func (x *FolderPolicy) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[20]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1742,7 +1886,7 @@ func (x *FolderPolicy) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FolderPolicy.ProtoReflect.Descriptor instead.
 func (*FolderPolicy) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{20}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *FolderPolicy) GetFolderId() string {
@@ -1791,7 +1935,7 @@ type StartRestoreRequest struct {
 
 func (x *StartRestoreRequest) Reset() {
 	*x = StartRestoreRequest{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[21]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1803,7 +1947,7 @@ func (x *StartRestoreRequest) String() string {
 func (*StartRestoreRequest) ProtoMessage() {}
 
 func (x *StartRestoreRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[21]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1816,7 +1960,7 @@ func (x *StartRestoreRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartRestoreRequest.ProtoReflect.Descriptor instead.
 func (*StartRestoreRequest) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{21}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *StartRestoreRequest) GetFolderId() string {
@@ -1861,7 +2005,7 @@ type RestoreJob struct {
 
 func (x *RestoreJob) Reset() {
 	*x = RestoreJob{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[22]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1873,7 +2017,7 @@ func (x *RestoreJob) String() string {
 func (*RestoreJob) ProtoMessage() {}
 
 func (x *RestoreJob) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[22]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1886,7 +2030,7 @@ func (x *RestoreJob) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestoreJob.ProtoReflect.Descriptor instead.
 func (*RestoreJob) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{22}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *RestoreJob) GetRestoreId() string {
@@ -1991,7 +2135,7 @@ type ListRestoreItemsRequest struct {
 
 func (x *ListRestoreItemsRequest) Reset() {
 	*x = ListRestoreItemsRequest{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[23]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2003,7 +2147,7 @@ func (x *ListRestoreItemsRequest) String() string {
 func (*ListRestoreItemsRequest) ProtoMessage() {}
 
 func (x *ListRestoreItemsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[23]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2016,7 +2160,7 @@ func (x *ListRestoreItemsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRestoreItemsRequest.ProtoReflect.Descriptor instead.
 func (*ListRestoreItemsRequest) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{23}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ListRestoreItemsRequest) GetRestoreId() string {
@@ -2059,7 +2203,7 @@ type RestoreItem struct {
 
 func (x *RestoreItem) Reset() {
 	*x = RestoreItem{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[24]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2071,7 +2215,7 @@ func (x *RestoreItem) String() string {
 func (*RestoreItem) ProtoMessage() {}
 
 func (x *RestoreItem) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[24]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2084,7 +2228,7 @@ func (x *RestoreItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestoreItem.ProtoReflect.Descriptor instead.
 func (*RestoreItem) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{24}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *RestoreItem) GetOrdinal() int64 {
@@ -2174,7 +2318,7 @@ type ListRestoreItemsResponse struct {
 
 func (x *ListRestoreItemsResponse) Reset() {
 	*x = ListRestoreItemsResponse{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[25]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2186,7 +2330,7 @@ func (x *ListRestoreItemsResponse) String() string {
 func (*ListRestoreItemsResponse) ProtoMessage() {}
 
 func (x *ListRestoreItemsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[25]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2199,7 +2343,7 @@ func (x *ListRestoreItemsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRestoreItemsResponse.ProtoReflect.Descriptor instead.
 func (*ListRestoreItemsResponse) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{25}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ListRestoreItemsResponse) GetJob() *RestoreJob {
@@ -2228,7 +2372,7 @@ type ReportRestoreItemRequest struct {
 
 func (x *ReportRestoreItemRequest) Reset() {
 	*x = ReportRestoreItemRequest{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[26]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2240,7 +2384,7 @@ func (x *ReportRestoreItemRequest) String() string {
 func (*ReportRestoreItemRequest) ProtoMessage() {}
 
 func (x *ReportRestoreItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[26]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2253,7 +2397,7 @@ func (x *ReportRestoreItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportRestoreItemRequest.ProtoReflect.Descriptor instead.
 func (*ReportRestoreItemRequest) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{26}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ReportRestoreItemRequest) GetRestoreId() string {
@@ -2295,7 +2439,7 @@ type FinishRestoreRequest struct {
 
 func (x *FinishRestoreRequest) Reset() {
 	*x = FinishRestoreRequest{}
-	mi := &file_api_sync_v1_sync_proto_msgTypes[27]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2307,7 +2451,7 @@ func (x *FinishRestoreRequest) String() string {
 func (*FinishRestoreRequest) ProtoMessage() {}
 
 func (x *FinishRestoreRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_api_sync_v1_sync_proto_msgTypes[27]
+	mi := &file_api_sync_v1_sync_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2320,7 +2464,7 @@ func (x *FinishRestoreRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FinishRestoreRequest.ProtoReflect.Descriptor instead.
 func (*FinishRestoreRequest) Descriptor() ([]byte, []int) {
-	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{27}
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *FinishRestoreRequest) GetRestoreId() string {
@@ -2434,7 +2578,20 @@ const file_api_sync_v1_sync_proto_rawDesc = "" +
 	"\x0flatest_sequence\x18\x02 \x01(\x03R\x0elatestSequence\"L\n" +
 	"\x11AckChangesRequest\x12\x1b\n" +
 	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x12\x1a\n" +
-	"\bsequence\x18\x02 \x01(\x03R\bsequence\"\x8d\x01\n" +
+	"\bsequence\x18\x02 \x01(\x03R\bsequence\"\xb3\x01\n" +
+	"\x13EnsureFolderRequest\x12(\n" +
+	"\x10source_folder_id\x18\x01 \x01(\tR\x0esourceFolderId\x12\x1d\n" +
+	"\n" +
+	"client_key\x18\x02 \x01(\tR\tclientKey\x12!\n" +
+	"\fdisplay_name\x18\x03 \x01(\tR\vdisplayName\x120\n" +
+	"\x14allow_source_binding\x18\x04 \x01(\bR\x12allowSourceBinding\"\xb6\x01\n" +
+	"\x12FolderRegistration\x12\x1b\n" +
+	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x12\x1d\n" +
+	"\n" +
+	"client_key\x18\x02 \x01(\tR\tclientKey\x12!\n" +
+	"\fdisplay_name\x18\x03 \x01(\tR\vdisplayName\x12'\n" +
+	"\x04role\x18\x04 \x01(\x0e2\x13.sync.v1.FolderRoleR\x04role\x12\x18\n" +
+	"\acreated\x18\x05 \x01(\bR\acreated\"\x8d\x01\n" +
 	"\x17CreateEnrollmentRequest\x12\x1b\n" +
 	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x12'\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x13.sync.v1.FolderRoleR\x04role\x12,\n" +
@@ -2560,7 +2717,7 @@ const file_api_sync_v1_sync_proto_rawDesc = "" +
 	"\x1aRESTORE_ITEM_STATE_PENDING\x10\x01\x12\x1e\n" +
 	"\x1aRESTORE_ITEM_STATE_APPLIED\x10\x02\x12\x1e\n" +
 	"\x1aRESTORE_ITEM_STATE_SKIPPED\x10\x03\x12\x1d\n" +
-	"\x19RESTORE_ITEM_STATE_FAILED\x10\x042\xd5\b\n" +
+	"\x19RESTORE_ITEM_STATE_FAILED\x10\x042\xa0\t\n" +
 	"\vSyncService\x12:\n" +
 	"\bOpenSync\x12\x14.sync.v1.ClientFrame\x1a\x14.sync.v1.ServerFrame(\x010\x01\x12H\n" +
 	"\vBeginUpload\x12\x1b.sync.v1.BeginUploadRequest\x1a\x1c.sync.v1.BeginUploadResponse\x127\n" +
@@ -2569,7 +2726,8 @@ const file_api_sync_v1_sync_proto_rawDesc = "" +
 	"\bDownload\x12\x18.sync.v1.DownloadRequest\x1a\x16.sync.v1.DownloadChunk0\x01\x12H\n" +
 	"\vListChanges\x12\x1b.sync.v1.ListChangesRequest\x1a\x1c.sync.v1.ListChangesResponse\x12@\n" +
 	"\n" +
-	"AckChanges\x12\x1a.sync.v1.AckChangesRequest\x1a\x16.google.protobuf.Empty\x12W\n" +
+	"AckChanges\x12\x1a.sync.v1.AckChangesRequest\x1a\x16.google.protobuf.Empty\x12I\n" +
+	"\fEnsureFolder\x12\x1c.sync.v1.EnsureFolderRequest\x1a\x1b.sync.v1.FolderRegistration\x12W\n" +
 	"\x10CreateEnrollment\x12 .sync.v1.CreateEnrollmentRequest\x1a!.sync.v1.CreateEnrollmentResponse\x12K\n" +
 	"\fEnrollDevice\x12\x1c.sync.v1.EnrollDeviceRequest\x1a\x1d.sync.v1.EnrollDeviceResponse\x12I\n" +
 	"\x0fGetFolderPolicy\x12\x1f.sync.v1.GetFolderPolicyRequest\x1a\x15.sync.v1.FolderPolicy\x12O\n" +
@@ -2592,7 +2750,7 @@ func file_api_sync_v1_sync_proto_rawDescGZIP() []byte {
 }
 
 var file_api_sync_v1_sync_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_api_sync_v1_sync_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_api_sync_v1_sync_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_api_sync_v1_sync_proto_goTypes = []any{
 	(ChangeKind)(0),                   // 0: sync.v1.ChangeKind
 	(UploadDisposition)(0),            // 1: sync.v1.UploadDisposition
@@ -2614,78 +2772,83 @@ var file_api_sync_v1_sync_proto_goTypes = []any{
 	(*Change)(nil),                    // 17: sync.v1.Change
 	(*ListChangesResponse)(nil),       // 18: sync.v1.ListChangesResponse
 	(*AckChangesRequest)(nil),         // 19: sync.v1.AckChangesRequest
-	(*CreateEnrollmentRequest)(nil),   // 20: sync.v1.CreateEnrollmentRequest
-	(*CreateEnrollmentResponse)(nil),  // 21: sync.v1.CreateEnrollmentResponse
-	(*EnrollDeviceRequest)(nil),       // 22: sync.v1.EnrollDeviceRequest
-	(*EnrollDeviceResponse)(nil),      // 23: sync.v1.EnrollDeviceResponse
-	(*GetFolderPolicyRequest)(nil),    // 24: sync.v1.GetFolderPolicyRequest
-	(*UpdateFolderPolicyRequest)(nil), // 25: sync.v1.UpdateFolderPolicyRequest
-	(*FolderPolicy)(nil),              // 26: sync.v1.FolderPolicy
-	(*StartRestoreRequest)(nil),       // 27: sync.v1.StartRestoreRequest
-	(*RestoreJob)(nil),                // 28: sync.v1.RestoreJob
-	(*ListRestoreItemsRequest)(nil),   // 29: sync.v1.ListRestoreItemsRequest
-	(*RestoreItem)(nil),               // 30: sync.v1.RestoreItem
-	(*ListRestoreItemsResponse)(nil),  // 31: sync.v1.ListRestoreItemsResponse
-	(*ReportRestoreItemRequest)(nil),  // 32: sync.v1.ReportRestoreItemRequest
-	(*FinishRestoreRequest)(nil),      // 33: sync.v1.FinishRestoreRequest
-	(*timestamppb.Timestamp)(nil),     // 34: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),             // 35: google.protobuf.Empty
+	(*EnsureFolderRequest)(nil),       // 20: sync.v1.EnsureFolderRequest
+	(*FolderRegistration)(nil),        // 21: sync.v1.FolderRegistration
+	(*CreateEnrollmentRequest)(nil),   // 22: sync.v1.CreateEnrollmentRequest
+	(*CreateEnrollmentResponse)(nil),  // 23: sync.v1.CreateEnrollmentResponse
+	(*EnrollDeviceRequest)(nil),       // 24: sync.v1.EnrollDeviceRequest
+	(*EnrollDeviceResponse)(nil),      // 25: sync.v1.EnrollDeviceResponse
+	(*GetFolderPolicyRequest)(nil),    // 26: sync.v1.GetFolderPolicyRequest
+	(*UpdateFolderPolicyRequest)(nil), // 27: sync.v1.UpdateFolderPolicyRequest
+	(*FolderPolicy)(nil),              // 28: sync.v1.FolderPolicy
+	(*StartRestoreRequest)(nil),       // 29: sync.v1.StartRestoreRequest
+	(*RestoreJob)(nil),                // 30: sync.v1.RestoreJob
+	(*ListRestoreItemsRequest)(nil),   // 31: sync.v1.ListRestoreItemsRequest
+	(*RestoreItem)(nil),               // 32: sync.v1.RestoreItem
+	(*ListRestoreItemsResponse)(nil),  // 33: sync.v1.ListRestoreItemsResponse
+	(*ReportRestoreItemRequest)(nil),  // 34: sync.v1.ReportRestoreItemRequest
+	(*FinishRestoreRequest)(nil),      // 35: sync.v1.FinishRestoreRequest
+	(*timestamppb.Timestamp)(nil),     // 36: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),             // 37: google.protobuf.Empty
 }
 var file_api_sync_v1_sync_proto_depIdxs = []int32{
 	0,  // 0: sync.v1.BeginUploadRequest.kind:type_name -> sync.v1.ChangeKind
 	1,  // 1: sync.v1.BeginUploadResponse.disposition:type_name -> sync.v1.UploadDisposition
-	34, // 2: sync.v1.BeginUploadResponse.expires_at:type_name -> google.protobuf.Timestamp
+	36, // 2: sync.v1.BeginUploadResponse.expires_at:type_name -> google.protobuf.Timestamp
 	0,  // 3: sync.v1.CommitChangeRequest.kind:type_name -> sync.v1.ChangeKind
 	2,  // 4: sync.v1.CommitChangeResponse.disposition:type_name -> sync.v1.CommitDisposition
 	0,  // 5: sync.v1.Change.kind:type_name -> sync.v1.ChangeKind
 	17, // 6: sync.v1.ListChangesResponse.changes:type_name -> sync.v1.Change
-	3,  // 7: sync.v1.CreateEnrollmentRequest.role:type_name -> sync.v1.FolderRole
-	3,  // 8: sync.v1.CreateEnrollmentResponse.role:type_name -> sync.v1.FolderRole
-	34, // 9: sync.v1.CreateEnrollmentResponse.expires_at:type_name -> google.protobuf.Timestamp
-	3,  // 10: sync.v1.EnrollDeviceResponse.role:type_name -> sync.v1.FolderRole
-	34, // 11: sync.v1.FolderPolicy.updated_at:type_name -> google.protobuf.Timestamp
-	4,  // 12: sync.v1.RestoreJob.state:type_name -> sync.v1.RestoreState
-	34, // 13: sync.v1.RestoreJob.created_at:type_name -> google.protobuf.Timestamp
-	34, // 14: sync.v1.RestoreJob.completed_at:type_name -> google.protobuf.Timestamp
-	5,  // 15: sync.v1.RestoreItem.state:type_name -> sync.v1.RestoreItemState
-	28, // 16: sync.v1.ListRestoreItemsResponse.job:type_name -> sync.v1.RestoreJob
-	30, // 17: sync.v1.ListRestoreItemsResponse.items:type_name -> sync.v1.RestoreItem
-	5,  // 18: sync.v1.ReportRestoreItemRequest.state:type_name -> sync.v1.RestoreItemState
-	12, // 19: sync.v1.SyncService.OpenSync:input_type -> sync.v1.ClientFrame
-	6,  // 20: sync.v1.SyncService.BeginUpload:input_type -> sync.v1.BeginUploadRequest
-	8,  // 21: sync.v1.SyncService.Upload:input_type -> sync.v1.UploadChunk
-	10, // 22: sync.v1.SyncService.CommitChange:input_type -> sync.v1.CommitChangeRequest
-	14, // 23: sync.v1.SyncService.Download:input_type -> sync.v1.DownloadRequest
-	16, // 24: sync.v1.SyncService.ListChanges:input_type -> sync.v1.ListChangesRequest
-	19, // 25: sync.v1.SyncService.AckChanges:input_type -> sync.v1.AckChangesRequest
-	20, // 26: sync.v1.SyncService.CreateEnrollment:input_type -> sync.v1.CreateEnrollmentRequest
-	22, // 27: sync.v1.SyncService.EnrollDevice:input_type -> sync.v1.EnrollDeviceRequest
-	24, // 28: sync.v1.SyncService.GetFolderPolicy:input_type -> sync.v1.GetFolderPolicyRequest
-	25, // 29: sync.v1.SyncService.UpdateFolderPolicy:input_type -> sync.v1.UpdateFolderPolicyRequest
-	27, // 30: sync.v1.SyncService.StartRestore:input_type -> sync.v1.StartRestoreRequest
-	29, // 31: sync.v1.SyncService.ListRestoreItems:input_type -> sync.v1.ListRestoreItemsRequest
-	32, // 32: sync.v1.SyncService.ReportRestoreItem:input_type -> sync.v1.ReportRestoreItemRequest
-	33, // 33: sync.v1.SyncService.FinishRestore:input_type -> sync.v1.FinishRestoreRequest
-	13, // 34: sync.v1.SyncService.OpenSync:output_type -> sync.v1.ServerFrame
-	7,  // 35: sync.v1.SyncService.BeginUpload:output_type -> sync.v1.BeginUploadResponse
-	9,  // 36: sync.v1.SyncService.Upload:output_type -> sync.v1.UploadResult
-	11, // 37: sync.v1.SyncService.CommitChange:output_type -> sync.v1.CommitChangeResponse
-	15, // 38: sync.v1.SyncService.Download:output_type -> sync.v1.DownloadChunk
-	18, // 39: sync.v1.SyncService.ListChanges:output_type -> sync.v1.ListChangesResponse
-	35, // 40: sync.v1.SyncService.AckChanges:output_type -> google.protobuf.Empty
-	21, // 41: sync.v1.SyncService.CreateEnrollment:output_type -> sync.v1.CreateEnrollmentResponse
-	23, // 42: sync.v1.SyncService.EnrollDevice:output_type -> sync.v1.EnrollDeviceResponse
-	26, // 43: sync.v1.SyncService.GetFolderPolicy:output_type -> sync.v1.FolderPolicy
-	26, // 44: sync.v1.SyncService.UpdateFolderPolicy:output_type -> sync.v1.FolderPolicy
-	28, // 45: sync.v1.SyncService.StartRestore:output_type -> sync.v1.RestoreJob
-	31, // 46: sync.v1.SyncService.ListRestoreItems:output_type -> sync.v1.ListRestoreItemsResponse
-	28, // 47: sync.v1.SyncService.ReportRestoreItem:output_type -> sync.v1.RestoreJob
-	28, // 48: sync.v1.SyncService.FinishRestore:output_type -> sync.v1.RestoreJob
-	34, // [34:49] is the sub-list for method output_type
-	19, // [19:34] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	3,  // 7: sync.v1.FolderRegistration.role:type_name -> sync.v1.FolderRole
+	3,  // 8: sync.v1.CreateEnrollmentRequest.role:type_name -> sync.v1.FolderRole
+	3,  // 9: sync.v1.CreateEnrollmentResponse.role:type_name -> sync.v1.FolderRole
+	36, // 10: sync.v1.CreateEnrollmentResponse.expires_at:type_name -> google.protobuf.Timestamp
+	3,  // 11: sync.v1.EnrollDeviceResponse.role:type_name -> sync.v1.FolderRole
+	36, // 12: sync.v1.FolderPolicy.updated_at:type_name -> google.protobuf.Timestamp
+	4,  // 13: sync.v1.RestoreJob.state:type_name -> sync.v1.RestoreState
+	36, // 14: sync.v1.RestoreJob.created_at:type_name -> google.protobuf.Timestamp
+	36, // 15: sync.v1.RestoreJob.completed_at:type_name -> google.protobuf.Timestamp
+	5,  // 16: sync.v1.RestoreItem.state:type_name -> sync.v1.RestoreItemState
+	30, // 17: sync.v1.ListRestoreItemsResponse.job:type_name -> sync.v1.RestoreJob
+	32, // 18: sync.v1.ListRestoreItemsResponse.items:type_name -> sync.v1.RestoreItem
+	5,  // 19: sync.v1.ReportRestoreItemRequest.state:type_name -> sync.v1.RestoreItemState
+	12, // 20: sync.v1.SyncService.OpenSync:input_type -> sync.v1.ClientFrame
+	6,  // 21: sync.v1.SyncService.BeginUpload:input_type -> sync.v1.BeginUploadRequest
+	8,  // 22: sync.v1.SyncService.Upload:input_type -> sync.v1.UploadChunk
+	10, // 23: sync.v1.SyncService.CommitChange:input_type -> sync.v1.CommitChangeRequest
+	14, // 24: sync.v1.SyncService.Download:input_type -> sync.v1.DownloadRequest
+	16, // 25: sync.v1.SyncService.ListChanges:input_type -> sync.v1.ListChangesRequest
+	19, // 26: sync.v1.SyncService.AckChanges:input_type -> sync.v1.AckChangesRequest
+	20, // 27: sync.v1.SyncService.EnsureFolder:input_type -> sync.v1.EnsureFolderRequest
+	22, // 28: sync.v1.SyncService.CreateEnrollment:input_type -> sync.v1.CreateEnrollmentRequest
+	24, // 29: sync.v1.SyncService.EnrollDevice:input_type -> sync.v1.EnrollDeviceRequest
+	26, // 30: sync.v1.SyncService.GetFolderPolicy:input_type -> sync.v1.GetFolderPolicyRequest
+	27, // 31: sync.v1.SyncService.UpdateFolderPolicy:input_type -> sync.v1.UpdateFolderPolicyRequest
+	29, // 32: sync.v1.SyncService.StartRestore:input_type -> sync.v1.StartRestoreRequest
+	31, // 33: sync.v1.SyncService.ListRestoreItems:input_type -> sync.v1.ListRestoreItemsRequest
+	34, // 34: sync.v1.SyncService.ReportRestoreItem:input_type -> sync.v1.ReportRestoreItemRequest
+	35, // 35: sync.v1.SyncService.FinishRestore:input_type -> sync.v1.FinishRestoreRequest
+	13, // 36: sync.v1.SyncService.OpenSync:output_type -> sync.v1.ServerFrame
+	7,  // 37: sync.v1.SyncService.BeginUpload:output_type -> sync.v1.BeginUploadResponse
+	9,  // 38: sync.v1.SyncService.Upload:output_type -> sync.v1.UploadResult
+	11, // 39: sync.v1.SyncService.CommitChange:output_type -> sync.v1.CommitChangeResponse
+	15, // 40: sync.v1.SyncService.Download:output_type -> sync.v1.DownloadChunk
+	18, // 41: sync.v1.SyncService.ListChanges:output_type -> sync.v1.ListChangesResponse
+	37, // 42: sync.v1.SyncService.AckChanges:output_type -> google.protobuf.Empty
+	21, // 43: sync.v1.SyncService.EnsureFolder:output_type -> sync.v1.FolderRegistration
+	23, // 44: sync.v1.SyncService.CreateEnrollment:output_type -> sync.v1.CreateEnrollmentResponse
+	25, // 45: sync.v1.SyncService.EnrollDevice:output_type -> sync.v1.EnrollDeviceResponse
+	28, // 46: sync.v1.SyncService.GetFolderPolicy:output_type -> sync.v1.FolderPolicy
+	28, // 47: sync.v1.SyncService.UpdateFolderPolicy:output_type -> sync.v1.FolderPolicy
+	30, // 48: sync.v1.SyncService.StartRestore:output_type -> sync.v1.RestoreJob
+	33, // 49: sync.v1.SyncService.ListRestoreItems:output_type -> sync.v1.ListRestoreItemsResponse
+	30, // 50: sync.v1.SyncService.ReportRestoreItem:output_type -> sync.v1.RestoreJob
+	30, // 51: sync.v1.SyncService.FinishRestore:output_type -> sync.v1.RestoreJob
+	36, // [36:52] is the sub-list for method output_type
+	20, // [20:36] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_api_sync_v1_sync_proto_init() }
@@ -2704,7 +2867,7 @@ func file_api_sync_v1_sync_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_sync_v1_sync_proto_rawDesc), len(file_api_sync_v1_sync_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   28,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

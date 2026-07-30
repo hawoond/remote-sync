@@ -10,6 +10,7 @@ import (
 	"io"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 	"github.com/hawoond/remote-sync/internal/domain"
@@ -25,6 +26,32 @@ const (
 	maxGCGracePeriod = 30 * 24 * time.Hour
 	maxErrorMessage  = 2048
 )
+
+func (e *Engine) EnsureFolder(
+	ctx context.Context,
+	deviceID, sourceFolderID, clientKey, displayName string,
+	allowSourceBinding bool,
+) (domain.FolderRegistration, error) {
+	if err := validateRequiredIDs(deviceID, sourceFolderID); err != nil {
+		return domain.FolderRegistration{}, err
+	}
+	clientKey = strings.TrimSpace(clientKey)
+	displayName = strings.TrimSpace(displayName)
+	if !validFolderClientKey(clientKey) ||
+		displayName == "" ||
+		len([]byte(displayName)) > 128 ||
+		!utf8.ValidString(displayName) {
+		return domain.FolderRegistration{}, ErrInvalidChange
+	}
+	return e.metadata.EnsureFolder(ctx, metadata.EnsureFolderParams{
+		ID:                 uuid.NewString(),
+		DeviceID:           deviceID,
+		SourceFolderID:     sourceFolderID,
+		ClientKey:          clientKey,
+		DisplayName:        displayName,
+		AllowSourceBinding: allowSourceBinding,
+	})
+}
 
 func (e *Engine) CreateEnrollment(
 	ctx context.Context,
@@ -242,4 +269,21 @@ func generateSecret(prefix string) (string, domain.Hash, error) {
 	token := prefix + base64.RawURLEncoding.EncodeToString(value)
 	digest := domain.Hash(sha256.Sum256([]byte(token)))
 	return token, digest, nil
+}
+
+func validFolderClientKey(value string) bool {
+	if value == "" || len(value) > 128 {
+		return false
+	}
+	for _, character := range value {
+		switch {
+		case character >= 'a' && character <= 'z':
+		case character >= 'A' && character <= 'Z':
+		case character >= '0' && character <= '9':
+		case strings.ContainsRune(":._-", character):
+		default:
+			return false
+		}
+	}
+	return true
 }

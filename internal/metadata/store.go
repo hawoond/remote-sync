@@ -78,6 +78,15 @@ type ConsumeEnrollmentParams struct {
 	CapabilitiesJSON string
 }
 
+type EnsureFolderParams struct {
+	ID                 string
+	DeviceID           string
+	SourceFolderID     string
+	ClientKey          string
+	DisplayName        string
+	AllowSourceBinding bool
+}
+
 type StartRestoreParams struct {
 	ID               string
 	DeviceID         string
@@ -101,6 +110,7 @@ type Store interface {
 	ListChanges(context.Context, string, string, int64, int) ([]domain.Change, int64, error)
 	AckChanges(context.Context, string, string, int64) error
 	DeviceForCredential(context.Context, domain.Hash) (string, error)
+	EnsureFolder(context.Context, EnsureFolderParams) (domain.FolderRegistration, error)
 	CreateEnrollment(context.Context, CreateEnrollmentParams) error
 	ConsumeEnrollment(context.Context, ConsumeEnrollmentParams) (domain.DeviceCredentials, error)
 	GetFolderPolicy(context.Context, string, string) (domain.FolderPolicy, error)

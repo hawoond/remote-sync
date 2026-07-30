@@ -64,6 +64,68 @@ func TestSelectInteractiveDoesNotAutoSelectSingleCandidate(t *testing.T) {
 	}
 }
 
+func TestSelectInteractiveManyAcceptsNumbersRangesAndDeduplicates(t *testing.T) {
+	t.Parallel()
+
+	candidates := append(selectionCandidates(t), Candidate{
+		ID:         "codex:333333333333",
+		Provider:   ProviderCodex,
+		Name:       "three",
+		Path:       filepath.Join(t.TempDir(), "three"),
+		Repository: "repo",
+		Branch:     "worktree-three",
+		Head:       "fedcba654321",
+	})
+	var output bytes.Buffer
+	selected, err := SelectInteractiveMany(
+		strings.NewReader("invalid\n2,1-2 3\n"),
+		&output,
+		candidates,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(selected) != 3 ||
+		selected[0].ID != candidates[1].ID ||
+		selected[1].ID != candidates[0].ID ||
+		selected[2].ID != candidates[2].ID {
+		t.Fatalf("selected = %+v", selected)
+	}
+	if !strings.Contains(output.String(), "Invalid selection") {
+		t.Fatalf("selection output = %q", output.String())
+	}
+}
+
+func TestSelectInteractiveManyAcceptsExplicitAll(t *testing.T) {
+	t.Parallel()
+
+	candidates := selectionCandidates(t)
+	selected, err := SelectInteractiveMany(
+		strings.NewReader("all\n"),
+		&bytes.Buffer{},
+		candidates,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(selected) != len(candidates) {
+		t.Fatalf("selected %d candidates, want %d", len(selected), len(candidates))
+	}
+}
+
+func TestSelectInteractiveManyStillRequiresChoiceForSingleCandidate(t *testing.T) {
+	t.Parallel()
+
+	_, err := SelectInteractiveMany(
+		strings.NewReader(""),
+		&bytes.Buffer{},
+		selectionCandidates(t)[:1],
+	)
+	if !errors.Is(err, ErrSelectionRequired) {
+		t.Fatalf("error = %v, want ErrSelectionRequired", err)
+	}
+}
+
 func TestSelectReferenceAcceptsIDOrPath(t *testing.T) {
 	t.Parallel()
 
@@ -85,6 +147,25 @@ func TestSelectReferenceAcceptsIDOrPath(t *testing.T) {
 	}
 	if _, err := SelectReference(candidates, "codex:missing"); err == nil {
 		t.Fatal("expected missing reference error")
+	}
+}
+
+func TestSelectReferencesPreservesOrderAndDeduplicates(t *testing.T) {
+	t.Parallel()
+
+	candidates := selectionCandidates(t)
+	selected, err := SelectReferences(candidates, []string{
+		candidates[1].ID,
+		candidates[0].Path,
+		candidates[1].Path,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(selected) != 2 ||
+		selected[0].ID != candidates[1].ID ||
+		selected[1].ID != candidates[0].ID {
+		t.Fatalf("selected = %+v", selected)
 	}
 }
 
