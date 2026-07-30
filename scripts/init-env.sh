@@ -187,7 +187,11 @@ trap 'rm -f "$temporary_path"' EXIT HUP INT TERM
     "MAX_FOLDER_LIVE_SIZE_BYTES=1099511627776" \
     "MAX_USER_LIVE_SIZE_BYTES=1099511627776" \
     "MAX_PENDING_UPLOAD_SIZE_BYTES=21474836480" \
-    "MAX_CHUNK_SIZE_BYTES=1048576"
+    "MAX_CHUNK_SIZE_BYTES=1048576" \
+    "" \
+    "GC_ENABLED=true" \
+    "GC_INTERVAL=1h" \
+    "GC_BATCH_SIZE=100"
 } >"$temporary_path"
 
 if [ -e "$output_path" ]; then

@@ -52,7 +52,14 @@ func TestPostgresUploadCommitReplayDeleteAndDeduplicate(t *testing.T) {
 	userID := uuid.NewString()
 	deviceID := uuid.NewString()
 	folderID := uuid.NewString()
-	if err := store.BootstrapDevelopment(ctx, userID, deviceID, folderID); err != nil {
+	credentialDigest := domain.Hash(sha256.Sum256([]byte("integration-device-token")))
+	if err := store.BootstrapDevelopment(
+		ctx,
+		userID,
+		deviceID,
+		folderID,
+		credentialDigest,
+	); err != nil {
 		t.Fatal(err)
 	}
 

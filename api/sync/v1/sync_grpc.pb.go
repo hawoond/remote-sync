@@ -20,13 +20,21 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SyncService_OpenSync_FullMethodName     = "/sync.v1.SyncService/OpenSync"
-	SyncService_BeginUpload_FullMethodName  = "/sync.v1.SyncService/BeginUpload"
-	SyncService_Upload_FullMethodName       = "/sync.v1.SyncService/Upload"
-	SyncService_CommitChange_FullMethodName = "/sync.v1.SyncService/CommitChange"
-	SyncService_Download_FullMethodName     = "/sync.v1.SyncService/Download"
-	SyncService_ListChanges_FullMethodName  = "/sync.v1.SyncService/ListChanges"
-	SyncService_AckChanges_FullMethodName   = "/sync.v1.SyncService/AckChanges"
+	SyncService_OpenSync_FullMethodName           = "/sync.v1.SyncService/OpenSync"
+	SyncService_BeginUpload_FullMethodName        = "/sync.v1.SyncService/BeginUpload"
+	SyncService_Upload_FullMethodName             = "/sync.v1.SyncService/Upload"
+	SyncService_CommitChange_FullMethodName       = "/sync.v1.SyncService/CommitChange"
+	SyncService_Download_FullMethodName           = "/sync.v1.SyncService/Download"
+	SyncService_ListChanges_FullMethodName        = "/sync.v1.SyncService/ListChanges"
+	SyncService_AckChanges_FullMethodName         = "/sync.v1.SyncService/AckChanges"
+	SyncService_CreateEnrollment_FullMethodName   = "/sync.v1.SyncService/CreateEnrollment"
+	SyncService_EnrollDevice_FullMethodName       = "/sync.v1.SyncService/EnrollDevice"
+	SyncService_GetFolderPolicy_FullMethodName    = "/sync.v1.SyncService/GetFolderPolicy"
+	SyncService_UpdateFolderPolicy_FullMethodName = "/sync.v1.SyncService/UpdateFolderPolicy"
+	SyncService_StartRestore_FullMethodName       = "/sync.v1.SyncService/StartRestore"
+	SyncService_ListRestoreItems_FullMethodName   = "/sync.v1.SyncService/ListRestoreItems"
+	SyncService_ReportRestoreItem_FullMethodName  = "/sync.v1.SyncService/ReportRestoreItem"
+	SyncService_FinishRestore_FullMethodName      = "/sync.v1.SyncService/FinishRestore"
 )
 
 // SyncServiceClient is the client API for SyncService service.
@@ -40,6 +48,14 @@ type SyncServiceClient interface {
 	Download(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadChunk], error)
 	ListChanges(ctx context.Context, in *ListChangesRequest, opts ...grpc.CallOption) (*ListChangesResponse, error)
 	AckChanges(ctx context.Context, in *AckChangesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreateEnrollment(ctx context.Context, in *CreateEnrollmentRequest, opts ...grpc.CallOption) (*CreateEnrollmentResponse, error)
+	EnrollDevice(ctx context.Context, in *EnrollDeviceRequest, opts ...grpc.CallOption) (*EnrollDeviceResponse, error)
+	GetFolderPolicy(ctx context.Context, in *GetFolderPolicyRequest, opts ...grpc.CallOption) (*FolderPolicy, error)
+	UpdateFolderPolicy(ctx context.Context, in *UpdateFolderPolicyRequest, opts ...grpc.CallOption) (*FolderPolicy, error)
+	StartRestore(ctx context.Context, in *StartRestoreRequest, opts ...grpc.CallOption) (*RestoreJob, error)
+	ListRestoreItems(ctx context.Context, in *ListRestoreItemsRequest, opts ...grpc.CallOption) (*ListRestoreItemsResponse, error)
+	ReportRestoreItem(ctx context.Context, in *ReportRestoreItemRequest, opts ...grpc.CallOption) (*RestoreJob, error)
+	FinishRestore(ctx context.Context, in *FinishRestoreRequest, opts ...grpc.CallOption) (*RestoreJob, error)
 }
 
 type syncServiceClient struct {
@@ -135,6 +151,86 @@ func (c *syncServiceClient) AckChanges(ctx context.Context, in *AckChangesReques
 	return out, nil
 }
 
+func (c *syncServiceClient) CreateEnrollment(ctx context.Context, in *CreateEnrollmentRequest, opts ...grpc.CallOption) (*CreateEnrollmentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateEnrollmentResponse)
+	err := c.cc.Invoke(ctx, SyncService_CreateEnrollment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncServiceClient) EnrollDevice(ctx context.Context, in *EnrollDeviceRequest, opts ...grpc.CallOption) (*EnrollDeviceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EnrollDeviceResponse)
+	err := c.cc.Invoke(ctx, SyncService_EnrollDevice_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncServiceClient) GetFolderPolicy(ctx context.Context, in *GetFolderPolicyRequest, opts ...grpc.CallOption) (*FolderPolicy, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FolderPolicy)
+	err := c.cc.Invoke(ctx, SyncService_GetFolderPolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncServiceClient) UpdateFolderPolicy(ctx context.Context, in *UpdateFolderPolicyRequest, opts ...grpc.CallOption) (*FolderPolicy, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FolderPolicy)
+	err := c.cc.Invoke(ctx, SyncService_UpdateFolderPolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncServiceClient) StartRestore(ctx context.Context, in *StartRestoreRequest, opts ...grpc.CallOption) (*RestoreJob, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RestoreJob)
+	err := c.cc.Invoke(ctx, SyncService_StartRestore_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncServiceClient) ListRestoreItems(ctx context.Context, in *ListRestoreItemsRequest, opts ...grpc.CallOption) (*ListRestoreItemsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRestoreItemsResponse)
+	err := c.cc.Invoke(ctx, SyncService_ListRestoreItems_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncServiceClient) ReportRestoreItem(ctx context.Context, in *ReportRestoreItemRequest, opts ...grpc.CallOption) (*RestoreJob, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RestoreJob)
+	err := c.cc.Invoke(ctx, SyncService_ReportRestoreItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *syncServiceClient) FinishRestore(ctx context.Context, in *FinishRestoreRequest, opts ...grpc.CallOption) (*RestoreJob, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RestoreJob)
+	err := c.cc.Invoke(ctx, SyncService_FinishRestore_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SyncServiceServer is the server API for SyncService service.
 // All implementations must embed UnimplementedSyncServiceServer
 // for forward compatibility.
@@ -146,6 +242,14 @@ type SyncServiceServer interface {
 	Download(*DownloadRequest, grpc.ServerStreamingServer[DownloadChunk]) error
 	ListChanges(context.Context, *ListChangesRequest) (*ListChangesResponse, error)
 	AckChanges(context.Context, *AckChangesRequest) (*emptypb.Empty, error)
+	CreateEnrollment(context.Context, *CreateEnrollmentRequest) (*CreateEnrollmentResponse, error)
+	EnrollDevice(context.Context, *EnrollDeviceRequest) (*EnrollDeviceResponse, error)
+	GetFolderPolicy(context.Context, *GetFolderPolicyRequest) (*FolderPolicy, error)
+	UpdateFolderPolicy(context.Context, *UpdateFolderPolicyRequest) (*FolderPolicy, error)
+	StartRestore(context.Context, *StartRestoreRequest) (*RestoreJob, error)
+	ListRestoreItems(context.Context, *ListRestoreItemsRequest) (*ListRestoreItemsResponse, error)
+	ReportRestoreItem(context.Context, *ReportRestoreItemRequest) (*RestoreJob, error)
+	FinishRestore(context.Context, *FinishRestoreRequest) (*RestoreJob, error)
 	mustEmbedUnimplementedSyncServiceServer()
 }
 
@@ -176,6 +280,30 @@ func (UnimplementedSyncServiceServer) ListChanges(context.Context, *ListChangesR
 }
 func (UnimplementedSyncServiceServer) AckChanges(context.Context, *AckChangesRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method AckChanges not implemented")
+}
+func (UnimplementedSyncServiceServer) CreateEnrollment(context.Context, *CreateEnrollmentRequest) (*CreateEnrollmentResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateEnrollment not implemented")
+}
+func (UnimplementedSyncServiceServer) EnrollDevice(context.Context, *EnrollDeviceRequest) (*EnrollDeviceResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method EnrollDevice not implemented")
+}
+func (UnimplementedSyncServiceServer) GetFolderPolicy(context.Context, *GetFolderPolicyRequest) (*FolderPolicy, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetFolderPolicy not implemented")
+}
+func (UnimplementedSyncServiceServer) UpdateFolderPolicy(context.Context, *UpdateFolderPolicyRequest) (*FolderPolicy, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateFolderPolicy not implemented")
+}
+func (UnimplementedSyncServiceServer) StartRestore(context.Context, *StartRestoreRequest) (*RestoreJob, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartRestore not implemented")
+}
+func (UnimplementedSyncServiceServer) ListRestoreItems(context.Context, *ListRestoreItemsRequest) (*ListRestoreItemsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListRestoreItems not implemented")
+}
+func (UnimplementedSyncServiceServer) ReportRestoreItem(context.Context, *ReportRestoreItemRequest) (*RestoreJob, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReportRestoreItem not implemented")
+}
+func (UnimplementedSyncServiceServer) FinishRestore(context.Context, *FinishRestoreRequest) (*RestoreJob, error) {
+	return nil, status.Error(codes.Unimplemented, "method FinishRestore not implemented")
 }
 func (UnimplementedSyncServiceServer) mustEmbedUnimplementedSyncServiceServer() {}
 func (UnimplementedSyncServiceServer) testEmbeddedByValue()                     {}
@@ -295,6 +423,150 @@ func _SyncService_AckChanges_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SyncService_CreateEnrollment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateEnrollmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).CreateEnrollment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_CreateEnrollment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).CreateEnrollment(ctx, req.(*CreateEnrollmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncService_EnrollDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnrollDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).EnrollDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_EnrollDevice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).EnrollDevice(ctx, req.(*EnrollDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncService_GetFolderPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFolderPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).GetFolderPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_GetFolderPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).GetFolderPolicy(ctx, req.(*GetFolderPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncService_UpdateFolderPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFolderPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).UpdateFolderPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_UpdateFolderPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).UpdateFolderPolicy(ctx, req.(*UpdateFolderPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncService_StartRestore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartRestoreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).StartRestore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_StartRestore_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).StartRestore(ctx, req.(*StartRestoreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncService_ListRestoreItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRestoreItemsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).ListRestoreItems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_ListRestoreItems_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).ListRestoreItems(ctx, req.(*ListRestoreItemsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncService_ReportRestoreItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReportRestoreItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).ReportRestoreItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_ReportRestoreItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).ReportRestoreItem(ctx, req.(*ReportRestoreItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SyncService_FinishRestore_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FinishRestoreRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).FinishRestore(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_FinishRestore_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).FinishRestore(ctx, req.(*FinishRestoreRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SyncService_ServiceDesc is the grpc.ServiceDesc for SyncService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -317,6 +589,38 @@ var SyncService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AckChanges",
 			Handler:    _SyncService_AckChanges_Handler,
+		},
+		{
+			MethodName: "CreateEnrollment",
+			Handler:    _SyncService_CreateEnrollment_Handler,
+		},
+		{
+			MethodName: "EnrollDevice",
+			Handler:    _SyncService_EnrollDevice_Handler,
+		},
+		{
+			MethodName: "GetFolderPolicy",
+			Handler:    _SyncService_GetFolderPolicy_Handler,
+		},
+		{
+			MethodName: "UpdateFolderPolicy",
+			Handler:    _SyncService_UpdateFolderPolicy_Handler,
+		},
+		{
+			MethodName: "StartRestore",
+			Handler:    _SyncService_StartRestore_Handler,
+		},
+		{
+			MethodName: "ListRestoreItems",
+			Handler:    _SyncService_ListRestoreItems_Handler,
+		},
+		{
+			MethodName: "ReportRestoreItem",
+			Handler:    _SyncService_ReportRestoreItem_Handler,
+		},
+		{
+			MethodName: "FinishRestore",
+			Handler:    _SyncService_FinishRestore_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

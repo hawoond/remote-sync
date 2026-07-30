@@ -71,7 +71,14 @@ func TestUploadCommitOverGRPC(t *testing.T) {
 	token := "test-device-token-" + strings.Repeat("x", 32)
 
 	store := metadata.NewPostgres(pool, limits)
-	if err := store.BootstrapDevelopment(ctx, userID, deviceID, folderID); err != nil {
+	credentialDigest := domain.Hash(sha256.Sum256([]byte(token)))
+	if err := store.BootstrapDevelopment(
+		ctx,
+		userID,
+		deviceID,
+		folderID,
+		credentialDigest,
+	); err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
@@ -82,7 +89,7 @@ func TestUploadCommitOverGRPC(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	resolver, err := auth.NewTokenResolver(deviceID, token)
+	resolver, err := auth.NewDatabaseResolver(store)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -193,6 +200,115 @@ func TestUploadCommitOverGRPC(t *testing.T) {
 	}
 	if !bytes.Equal(stored, content) {
 		t.Fatal("stored object differs from uploaded content")
+	}
+
+	policy, err := client.UpdateFolderPolicy(
+		ctx,
+		folderID,
+		72*time.Hour,
+		2*time.Hour,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if policy.SafetyWindow != 72*time.Hour || policy.GCGracePeriod != 2*time.Hour {
+		t.Fatalf("updated policy = %+v", policy)
+	}
+
+	enrollment, err := client.CreateEnrollment(
+		ctx,
+		folderID,
+		domain.FolderRoleRestoreAdmin,
+		10*time.Minute,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	enrollmentClient, err := grpcclient.New(listener.Addr().String(), "", nil, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer enrollmentClient.Close()
+	credentials, err := enrollmentClient.EnrollDevice(
+		ctx,
+		enrollment.Token,
+		"restore-device",
+		"test",
+		`{"restore":true}`,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if credentials.FolderID != folderID ||
+		credentials.Role != domain.FolderRoleRestoreAdmin ||
+		credentials.DeviceID == "" ||
+		credentials.DeviceToken == "" {
+		t.Fatalf("enrolled credentials = %+v", credentials)
+	}
+	if _, err := enrollmentClient.EnrollDevice(
+		ctx,
+		enrollment.Token,
+		"replay-device",
+		"test",
+		`{}`,
+	); status.Code(err) != codes.FailedPrecondition {
+		t.Fatalf("enrollment replay status = %v, want FailedPrecondition", status.Code(err))
+	}
+
+	restoreClient, err := grpcclient.New(
+		listener.Addr().String(),
+		credentials.DeviceToken,
+		nil,
+		true,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer restoreClient.Close()
+	job, err := restoreClient.StartRestore(ctx, folderID, 1, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if job.TotalItems != 1 || job.SnapshotSequence != 1 {
+		t.Fatalf("restore job = %+v", job)
+	}
+	job, items, err := restoreClient.ListRestoreItems(ctx, job.ID, 0, 100)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if job.State != domain.RestoreStateRunning || len(items) != 1 {
+		t.Fatalf("restore manifest = job %+v items %+v", job, items)
+	}
+	var restored bytes.Buffer
+	downloadedHash, downloadedSize, err := restoreClient.Download(
+		ctx,
+		folderID,
+		items[0].ObjectHash,
+		&restored,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if downloadedHash != operation.Hash ||
+		downloadedSize != operation.Size ||
+		!bytes.Equal(restored.Bytes(), content) {
+		t.Fatal("restored object differs from committed content")
+	}
+	if _, err := restoreClient.ReportRestoreItem(
+		ctx,
+		job.ID,
+		items[0].Ordinal,
+		domain.RestoreItemStateApplied,
+		"",
+	); err != nil {
+		t.Fatal(err)
+	}
+	job, err = restoreClient.FinishRestore(ctx, job.ID, true, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if job.State != domain.RestoreStateCompleted || job.AppliedItems != 1 {
+		t.Fatalf("completed restore job = %+v", job)
 	}
 
 	unauthorized, err := grpcclient.New(

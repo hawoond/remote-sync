@@ -158,3 +158,33 @@ func TestLocalRejectsUnsafeSessionID(t *testing.T) {
 		t.Fatalf("expected ErrInvalidSessionID, got %v", err)
 	}
 }
+
+func TestLocalDeleteIsIdempotent(t *testing.T) {
+	t.Parallel()
+
+	store, err := NewLocal(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+
+	ctx := context.Background()
+	content := []byte("collect after grace")
+	hash := domain.Hash(sha256.Sum256(content))
+	sessionID := uuid.NewString()
+	if _, err := store.Append(ctx, sessionID, 0, content); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Finalize(ctx, sessionID, hash, int64(len(content))); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Delete(ctx, hash); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Open(ctx, hash); !errors.Is(err, ErrObjectNotFound) {
+		t.Fatalf("Open() error = %v, want ErrObjectNotFound", err)
+	}
+	if err := store.Delete(ctx, hash); err != nil {
+		t.Fatalf("second Delete() error = %v", err)
+	}
+}

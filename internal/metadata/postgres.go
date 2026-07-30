@@ -367,6 +367,16 @@ func (p *Postgres) Commit(ctx context.Context, input domain.CommitChange) (domai
 			return fmt.Errorf("insert file version: %w", err)
 		}
 
+		if found && entry.HeadVersionID != "" {
+			if _, err := tx.Exec(ctx, `
+				UPDATE file_versions
+				SET superseded_at = COALESCE(superseded_at, now())
+				WHERE id = $1
+			`, entry.HeadVersionID); err != nil {
+				return fmt.Errorf("mark previous version superseded: %w", err)
+			}
+		}
+
 		deleted := input.Kind == domain.ChangeKindDelete
 		if _, err := tx.Exec(ctx, `
 			UPDATE entries
@@ -385,6 +395,18 @@ func (p *Postgres) Commit(ctx context.Context, input domain.CommitChange) (domai
 			VALUES ($1, $2, $3, $4, $5)
 		`, input.FolderID, sequence, entryID, versionID, kind); err != nil {
 			return fmt.Errorf("insert change: %w", err)
+		}
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO device_cursors (folder_id, device_id, acked_sequence)
+			VALUES ($1, $2, $3)
+			ON CONFLICT (folder_id, device_id) DO UPDATE
+			SET acked_sequence = GREATEST(
+					device_cursors.acked_sequence,
+					EXCLUDED.acked_sequence
+				),
+			    updated_at = now()
+		`, input.FolderID, input.DeviceID, sequence); err != nil {
+			return fmt.Errorf("acknowledge origin change: %w", err)
 		}
 
 		if err := updateUsageAfterCommit(ctx, tx, userID, input.FolderID, oldLive, newLive, operation.DeclaredSize); err != nil {
@@ -512,7 +534,11 @@ func (p *Postgres) AckChanges(ctx context.Context, deviceID, folderID string, se
 	return nil
 }
 
-func (p *Postgres) BootstrapDevelopment(ctx context.Context, userID, deviceID, folderID string) error {
+func (p *Postgres) BootstrapDevelopment(
+	ctx context.Context,
+	userID, deviceID, folderID string,
+	credentialDigest domain.Hash,
+) error {
 	return pgx.BeginFunc(ctx, p.pool, func(tx pgx.Tx) error {
 		if _, err := tx.Exec(ctx, `
 			INSERT INTO users (id, status) VALUES ($1, 'ACTIVE')
@@ -521,10 +547,16 @@ func (p *Postgres) BootstrapDevelopment(ctx context.Context, userID, deviceID, f
 			return fmt.Errorf("bootstrap user: %w", err)
 		}
 		if _, err := tx.Exec(ctx, `
-			INSERT INTO devices (id, user_id, name, platform, status)
-			VALUES ($1, $2, 'development-device', 'development', 'ACTIVE')
-			ON CONFLICT (id) DO NOTHING
-		`, deviceID, userID); err != nil {
+			INSERT INTO devices (
+				id, user_id, name, platform, credential_digest, status
+			)
+			VALUES (
+				$1, $2, 'development-device', 'development', $3, 'ACTIVE'
+			)
+			ON CONFLICT (id) DO UPDATE
+			SET credential_digest = EXCLUDED.credential_digest,
+			    status = 'ACTIVE'
+		`, deviceID, userID, credentialDigest[:]); err != nil {
 			return fmt.Errorf("bootstrap device: %w", err)
 		}
 		if _, err := tx.Exec(ctx, `
@@ -536,11 +568,25 @@ func (p *Postgres) BootstrapDevelopment(ctx context.Context, userID, deviceID, f
 		}
 		if _, err := tx.Exec(ctx, `
 			INSERT INTO folder_devices (folder_id, device_id, role, can_read, can_write)
-			VALUES ($1, $2, 'WRITER', true, true)
+			VALUES ($1, $2, 'RESTORE_ADMIN', true, true)
 			ON CONFLICT (folder_id, device_id) DO UPDATE
-			SET can_read = true, can_write = true
+			SET role = 'RESTORE_ADMIN', can_read = true, can_write = true
 		`, folderID, deviceID); err != nil {
 			return fmt.Errorf("bootstrap folder device: %w", err)
+		}
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO folder_policies (folder_id)
+			VALUES ($1)
+			ON CONFLICT (folder_id) DO NOTHING
+		`, folderID); err != nil {
+			return fmt.Errorf("bootstrap folder policy: %w", err)
+		}
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO device_cursors (folder_id, device_id, acked_sequence)
+			VALUES ($1, $2, 0)
+			ON CONFLICT (folder_id, device_id) DO NOTHING
+		`, folderID, deviceID); err != nil {
+			return fmt.Errorf("bootstrap device cursor: %w", err)
 		}
 		for _, scope := range []struct {
 			Type string

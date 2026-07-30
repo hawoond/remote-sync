@@ -182,6 +182,168 @@ func (CommitDisposition) EnumDescriptor() ([]byte, []int) {
 	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{2}
 }
 
+type FolderRole int32
+
+const (
+	FolderRole_FOLDER_ROLE_UNSPECIFIED   FolderRole = 0
+	FolderRole_FOLDER_ROLE_READER        FolderRole = 1
+	FolderRole_FOLDER_ROLE_WRITER        FolderRole = 2
+	FolderRole_FOLDER_ROLE_RESTORE_ADMIN FolderRole = 3
+)
+
+// Enum value maps for FolderRole.
+var (
+	FolderRole_name = map[int32]string{
+		0: "FOLDER_ROLE_UNSPECIFIED",
+		1: "FOLDER_ROLE_READER",
+		2: "FOLDER_ROLE_WRITER",
+		3: "FOLDER_ROLE_RESTORE_ADMIN",
+	}
+	FolderRole_value = map[string]int32{
+		"FOLDER_ROLE_UNSPECIFIED":   0,
+		"FOLDER_ROLE_READER":        1,
+		"FOLDER_ROLE_WRITER":        2,
+		"FOLDER_ROLE_RESTORE_ADMIN": 3,
+	}
+)
+
+func (x FolderRole) Enum() *FolderRole {
+	p := new(FolderRole)
+	*p = x
+	return p
+}
+
+func (x FolderRole) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FolderRole) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_sync_v1_sync_proto_enumTypes[3].Descriptor()
+}
+
+func (FolderRole) Type() protoreflect.EnumType {
+	return &file_api_sync_v1_sync_proto_enumTypes[3]
+}
+
+func (x FolderRole) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FolderRole.Descriptor instead.
+func (FolderRole) EnumDescriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{3}
+}
+
+type RestoreState int32
+
+const (
+	RestoreState_RESTORE_STATE_UNSPECIFIED RestoreState = 0
+	RestoreState_RESTORE_STATE_READY       RestoreState = 1
+	RestoreState_RESTORE_STATE_RUNNING     RestoreState = 2
+	RestoreState_RESTORE_STATE_COMPLETED   RestoreState = 3
+	RestoreState_RESTORE_STATE_FAILED      RestoreState = 4
+)
+
+// Enum value maps for RestoreState.
+var (
+	RestoreState_name = map[int32]string{
+		0: "RESTORE_STATE_UNSPECIFIED",
+		1: "RESTORE_STATE_READY",
+		2: "RESTORE_STATE_RUNNING",
+		3: "RESTORE_STATE_COMPLETED",
+		4: "RESTORE_STATE_FAILED",
+	}
+	RestoreState_value = map[string]int32{
+		"RESTORE_STATE_UNSPECIFIED": 0,
+		"RESTORE_STATE_READY":       1,
+		"RESTORE_STATE_RUNNING":     2,
+		"RESTORE_STATE_COMPLETED":   3,
+		"RESTORE_STATE_FAILED":      4,
+	}
+)
+
+func (x RestoreState) Enum() *RestoreState {
+	p := new(RestoreState)
+	*p = x
+	return p
+}
+
+func (x RestoreState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RestoreState) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_sync_v1_sync_proto_enumTypes[4].Descriptor()
+}
+
+func (RestoreState) Type() protoreflect.EnumType {
+	return &file_api_sync_v1_sync_proto_enumTypes[4]
+}
+
+func (x RestoreState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RestoreState.Descriptor instead.
+func (RestoreState) EnumDescriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{4}
+}
+
+type RestoreItemState int32
+
+const (
+	RestoreItemState_RESTORE_ITEM_STATE_UNSPECIFIED RestoreItemState = 0
+	RestoreItemState_RESTORE_ITEM_STATE_PENDING     RestoreItemState = 1
+	RestoreItemState_RESTORE_ITEM_STATE_APPLIED     RestoreItemState = 2
+	RestoreItemState_RESTORE_ITEM_STATE_SKIPPED     RestoreItemState = 3
+	RestoreItemState_RESTORE_ITEM_STATE_FAILED      RestoreItemState = 4
+)
+
+// Enum value maps for RestoreItemState.
+var (
+	RestoreItemState_name = map[int32]string{
+		0: "RESTORE_ITEM_STATE_UNSPECIFIED",
+		1: "RESTORE_ITEM_STATE_PENDING",
+		2: "RESTORE_ITEM_STATE_APPLIED",
+		3: "RESTORE_ITEM_STATE_SKIPPED",
+		4: "RESTORE_ITEM_STATE_FAILED",
+	}
+	RestoreItemState_value = map[string]int32{
+		"RESTORE_ITEM_STATE_UNSPECIFIED": 0,
+		"RESTORE_ITEM_STATE_PENDING":     1,
+		"RESTORE_ITEM_STATE_APPLIED":     2,
+		"RESTORE_ITEM_STATE_SKIPPED":     3,
+		"RESTORE_ITEM_STATE_FAILED":      4,
+	}
+)
+
+func (x RestoreItemState) Enum() *RestoreItemState {
+	p := new(RestoreItemState)
+	*p = x
+	return p
+}
+
+func (x RestoreItemState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (RestoreItemState) Descriptor() protoreflect.EnumDescriptor {
+	return file_api_sync_v1_sync_proto_enumTypes[5].Descriptor()
+}
+
+func (RestoreItemState) Type() protoreflect.EnumType {
+	return &file_api_sync_v1_sync_proto_enumTypes[5]
+}
+
+func (x RestoreItemState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use RestoreItemState.Descriptor instead.
+func (RestoreItemState) EnumDescriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{5}
+}
+
 type BeginUploadRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	OperationId   string                 `protobuf:"bytes,1,opt,name=operation_id,json=operationId,proto3" json:"operation_id,omitempty"`
@@ -786,6 +948,7 @@ type DownloadRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Sha256        []byte                 `protobuf:"bytes,1,opt,name=sha256,proto3" json:"sha256,omitempty"`
 	Offset        int64                  `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	FolderId      string                 `protobuf:"bytes,3,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -832,6 +995,13 @@ func (x *DownloadRequest) GetOffset() int64 {
 		return x.Offset
 	}
 	return 0
+}
+
+func (x *DownloadRequest) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
 }
 
 type DownloadChunk struct {
@@ -1158,6 +1328,1022 @@ func (x *AckChangesRequest) GetSequence() int64 {
 	return 0
 }
 
+type CreateEnrollmentRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	FolderId         string                 `protobuf:"bytes,1,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	Role             FolderRole             `protobuf:"varint,2,opt,name=role,proto3,enum=sync.v1.FolderRole" json:"role,omitempty"`
+	ExpiresInSeconds int64                  `protobuf:"varint,3,opt,name=expires_in_seconds,json=expiresInSeconds,proto3" json:"expires_in_seconds,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *CreateEnrollmentRequest) Reset() {
+	*x = CreateEnrollmentRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateEnrollmentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateEnrollmentRequest) ProtoMessage() {}
+
+func (x *CreateEnrollmentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateEnrollmentRequest.ProtoReflect.Descriptor instead.
+func (*CreateEnrollmentRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *CreateEnrollmentRequest) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *CreateEnrollmentRequest) GetRole() FolderRole {
+	if x != nil {
+		return x.Role
+	}
+	return FolderRole_FOLDER_ROLE_UNSPECIFIED
+}
+
+func (x *CreateEnrollmentRequest) GetExpiresInSeconds() int64 {
+	if x != nil {
+		return x.ExpiresInSeconds
+	}
+	return 0
+}
+
+type CreateEnrollmentResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	EnrollmentId    string                 `protobuf:"bytes,1,opt,name=enrollment_id,json=enrollmentId,proto3" json:"enrollment_id,omitempty"`
+	EnrollmentToken string                 `protobuf:"bytes,2,opt,name=enrollment_token,json=enrollmentToken,proto3" json:"enrollment_token,omitempty"`
+	FolderId        string                 `protobuf:"bytes,3,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	Role            FolderRole             `protobuf:"varint,4,opt,name=role,proto3,enum=sync.v1.FolderRole" json:"role,omitempty"`
+	ExpiresAt       *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *CreateEnrollmentResponse) Reset() {
+	*x = CreateEnrollmentResponse{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateEnrollmentResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateEnrollmentResponse) ProtoMessage() {}
+
+func (x *CreateEnrollmentResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateEnrollmentResponse.ProtoReflect.Descriptor instead.
+func (*CreateEnrollmentResponse) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CreateEnrollmentResponse) GetEnrollmentId() string {
+	if x != nil {
+		return x.EnrollmentId
+	}
+	return ""
+}
+
+func (x *CreateEnrollmentResponse) GetEnrollmentToken() string {
+	if x != nil {
+		return x.EnrollmentToken
+	}
+	return ""
+}
+
+func (x *CreateEnrollmentResponse) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *CreateEnrollmentResponse) GetRole() FolderRole {
+	if x != nil {
+		return x.Role
+	}
+	return FolderRole_FOLDER_ROLE_UNSPECIFIED
+}
+
+func (x *CreateEnrollmentResponse) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+type EnrollDeviceRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	EnrollmentToken  string                 `protobuf:"bytes,1,opt,name=enrollment_token,json=enrollmentToken,proto3" json:"enrollment_token,omitempty"`
+	DeviceName       string                 `protobuf:"bytes,2,opt,name=device_name,json=deviceName,proto3" json:"device_name,omitempty"`
+	Platform         string                 `protobuf:"bytes,3,opt,name=platform,proto3" json:"platform,omitempty"`
+	CapabilitiesJson string                 `protobuf:"bytes,4,opt,name=capabilities_json,json=capabilitiesJson,proto3" json:"capabilities_json,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *EnrollDeviceRequest) Reset() {
+	*x = EnrollDeviceRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnrollDeviceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnrollDeviceRequest) ProtoMessage() {}
+
+func (x *EnrollDeviceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnrollDeviceRequest.ProtoReflect.Descriptor instead.
+func (*EnrollDeviceRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *EnrollDeviceRequest) GetEnrollmentToken() string {
+	if x != nil {
+		return x.EnrollmentToken
+	}
+	return ""
+}
+
+func (x *EnrollDeviceRequest) GetDeviceName() string {
+	if x != nil {
+		return x.DeviceName
+	}
+	return ""
+}
+
+func (x *EnrollDeviceRequest) GetPlatform() string {
+	if x != nil {
+		return x.Platform
+	}
+	return ""
+}
+
+func (x *EnrollDeviceRequest) GetCapabilitiesJson() string {
+	if x != nil {
+		return x.CapabilitiesJson
+	}
+	return ""
+}
+
+type EnrollDeviceResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DeviceId      string                 `protobuf:"bytes,1,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	DeviceToken   string                 `protobuf:"bytes,2,opt,name=device_token,json=deviceToken,proto3" json:"device_token,omitempty"`
+	FolderId      string                 `protobuf:"bytes,3,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	Role          FolderRole             `protobuf:"varint,4,opt,name=role,proto3,enum=sync.v1.FolderRole" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EnrollDeviceResponse) Reset() {
+	*x = EnrollDeviceResponse{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EnrollDeviceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EnrollDeviceResponse) ProtoMessage() {}
+
+func (x *EnrollDeviceResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EnrollDeviceResponse.ProtoReflect.Descriptor instead.
+func (*EnrollDeviceResponse) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *EnrollDeviceResponse) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *EnrollDeviceResponse) GetDeviceToken() string {
+	if x != nil {
+		return x.DeviceToken
+	}
+	return ""
+}
+
+func (x *EnrollDeviceResponse) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *EnrollDeviceResponse) GetRole() FolderRole {
+	if x != nil {
+		return x.Role
+	}
+	return FolderRole_FOLDER_ROLE_UNSPECIFIED
+}
+
+type GetFolderPolicyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FolderId      string                 `protobuf:"bytes,1,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetFolderPolicyRequest) Reset() {
+	*x = GetFolderPolicyRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetFolderPolicyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetFolderPolicyRequest) ProtoMessage() {}
+
+func (x *GetFolderPolicyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetFolderPolicyRequest.ProtoReflect.Descriptor instead.
+func (*GetFolderPolicyRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GetFolderPolicyRequest) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+type UpdateFolderPolicyRequest struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	FolderId             string                 `protobuf:"bytes,1,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	SafetyWindowSeconds  int64                  `protobuf:"varint,2,opt,name=safety_window_seconds,json=safetyWindowSeconds,proto3" json:"safety_window_seconds,omitempty"`
+	GcGracePeriodSeconds int64                  `protobuf:"varint,3,opt,name=gc_grace_period_seconds,json=gcGracePeriodSeconds,proto3" json:"gc_grace_period_seconds,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *UpdateFolderPolicyRequest) Reset() {
+	*x = UpdateFolderPolicyRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFolderPolicyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFolderPolicyRequest) ProtoMessage() {}
+
+func (x *UpdateFolderPolicyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFolderPolicyRequest.ProtoReflect.Descriptor instead.
+func (*UpdateFolderPolicyRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *UpdateFolderPolicyRequest) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *UpdateFolderPolicyRequest) GetSafetyWindowSeconds() int64 {
+	if x != nil {
+		return x.SafetyWindowSeconds
+	}
+	return 0
+}
+
+func (x *UpdateFolderPolicyRequest) GetGcGracePeriodSeconds() int64 {
+	if x != nil {
+		return x.GcGracePeriodSeconds
+	}
+	return 0
+}
+
+type FolderPolicy struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	FolderId             string                 `protobuf:"bytes,1,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	SafetyWindowSeconds  int64                  `protobuf:"varint,2,opt,name=safety_window_seconds,json=safetyWindowSeconds,proto3" json:"safety_window_seconds,omitempty"`
+	GcGracePeriodSeconds int64                  `protobuf:"varint,3,opt,name=gc_grace_period_seconds,json=gcGracePeriodSeconds,proto3" json:"gc_grace_period_seconds,omitempty"`
+	Revision             int64                  `protobuf:"varint,4,opt,name=revision,proto3" json:"revision,omitempty"`
+	UpdatedAt            *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *FolderPolicy) Reset() {
+	*x = FolderPolicy{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FolderPolicy) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FolderPolicy) ProtoMessage() {}
+
+func (x *FolderPolicy) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FolderPolicy.ProtoReflect.Descriptor instead.
+func (*FolderPolicy) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *FolderPolicy) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *FolderPolicy) GetSafetyWindowSeconds() int64 {
+	if x != nil {
+		return x.SafetyWindowSeconds
+	}
+	return 0
+}
+
+func (x *FolderPolicy) GetGcGracePeriodSeconds() int64 {
+	if x != nil {
+		return x.GcGracePeriodSeconds
+	}
+	return 0
+}
+
+func (x *FolderPolicy) GetRevision() int64 {
+	if x != nil {
+		return x.Revision
+	}
+	return 0
+}
+
+func (x *FolderPolicy) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type StartRestoreRequest struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	FolderId          string                 `protobuf:"bytes,1,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	SnapshotSequence  int64                  `protobuf:"varint,2,opt,name=snapshot_sequence,json=snapshotSequence,proto3" json:"snapshot_sequence,omitempty"`
+	OverwriteExisting bool                   `protobuf:"varint,3,opt,name=overwrite_existing,json=overwriteExisting,proto3" json:"overwrite_existing,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *StartRestoreRequest) Reset() {
+	*x = StartRestoreRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartRestoreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartRestoreRequest) ProtoMessage() {}
+
+func (x *StartRestoreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartRestoreRequest.ProtoReflect.Descriptor instead.
+func (*StartRestoreRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *StartRestoreRequest) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *StartRestoreRequest) GetSnapshotSequence() int64 {
+	if x != nil {
+		return x.SnapshotSequence
+	}
+	return 0
+}
+
+func (x *StartRestoreRequest) GetOverwriteExisting() bool {
+	if x != nil {
+		return x.OverwriteExisting
+	}
+	return false
+}
+
+type RestoreJob struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	RestoreId         string                 `protobuf:"bytes,1,opt,name=restore_id,json=restoreId,proto3" json:"restore_id,omitempty"`
+	FolderId          string                 `protobuf:"bytes,2,opt,name=folder_id,json=folderId,proto3" json:"folder_id,omitempty"`
+	TargetDeviceId    string                 `protobuf:"bytes,3,opt,name=target_device_id,json=targetDeviceId,proto3" json:"target_device_id,omitempty"`
+	SnapshotSequence  int64                  `protobuf:"varint,4,opt,name=snapshot_sequence,json=snapshotSequence,proto3" json:"snapshot_sequence,omitempty"`
+	State             RestoreState           `protobuf:"varint,5,opt,name=state,proto3,enum=sync.v1.RestoreState" json:"state,omitempty"`
+	OverwriteExisting bool                   `protobuf:"varint,6,opt,name=overwrite_existing,json=overwriteExisting,proto3" json:"overwrite_existing,omitempty"`
+	TotalItems        int64                  `protobuf:"varint,7,opt,name=total_items,json=totalItems,proto3" json:"total_items,omitempty"`
+	AppliedItems      int64                  `protobuf:"varint,8,opt,name=applied_items,json=appliedItems,proto3" json:"applied_items,omitempty"`
+	SkippedItems      int64                  `protobuf:"varint,9,opt,name=skipped_items,json=skippedItems,proto3" json:"skipped_items,omitempty"`
+	FailedItems       int64                  `protobuf:"varint,10,opt,name=failed_items,json=failedItems,proto3" json:"failed_items,omitempty"`
+	ErrorMessage      string                 `protobuf:"bytes,11,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	CreatedAt         *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	CompletedAt       *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *RestoreJob) Reset() {
+	*x = RestoreJob{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RestoreJob) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestoreJob) ProtoMessage() {}
+
+func (x *RestoreJob) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestoreJob.ProtoReflect.Descriptor instead.
+func (*RestoreJob) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *RestoreJob) GetRestoreId() string {
+	if x != nil {
+		return x.RestoreId
+	}
+	return ""
+}
+
+func (x *RestoreJob) GetFolderId() string {
+	if x != nil {
+		return x.FolderId
+	}
+	return ""
+}
+
+func (x *RestoreJob) GetTargetDeviceId() string {
+	if x != nil {
+		return x.TargetDeviceId
+	}
+	return ""
+}
+
+func (x *RestoreJob) GetSnapshotSequence() int64 {
+	if x != nil {
+		return x.SnapshotSequence
+	}
+	return 0
+}
+
+func (x *RestoreJob) GetState() RestoreState {
+	if x != nil {
+		return x.State
+	}
+	return RestoreState_RESTORE_STATE_UNSPECIFIED
+}
+
+func (x *RestoreJob) GetOverwriteExisting() bool {
+	if x != nil {
+		return x.OverwriteExisting
+	}
+	return false
+}
+
+func (x *RestoreJob) GetTotalItems() int64 {
+	if x != nil {
+		return x.TotalItems
+	}
+	return 0
+}
+
+func (x *RestoreJob) GetAppliedItems() int64 {
+	if x != nil {
+		return x.AppliedItems
+	}
+	return 0
+}
+
+func (x *RestoreJob) GetSkippedItems() int64 {
+	if x != nil {
+		return x.SkippedItems
+	}
+	return 0
+}
+
+func (x *RestoreJob) GetFailedItems() int64 {
+	if x != nil {
+		return x.FailedItems
+	}
+	return 0
+}
+
+func (x *RestoreJob) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *RestoreJob) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *RestoreJob) GetCompletedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CompletedAt
+	}
+	return nil
+}
+
+type ListRestoreItemsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RestoreId     string                 `protobuf:"bytes,1,opt,name=restore_id,json=restoreId,proto3" json:"restore_id,omitempty"`
+	AfterOrdinal  int64                  `protobuf:"varint,2,opt,name=after_ordinal,json=afterOrdinal,proto3" json:"after_ordinal,omitempty"`
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRestoreItemsRequest) Reset() {
+	*x = ListRestoreItemsRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRestoreItemsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRestoreItemsRequest) ProtoMessage() {}
+
+func (x *ListRestoreItemsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRestoreItemsRequest.ProtoReflect.Descriptor instead.
+func (*ListRestoreItemsRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ListRestoreItemsRequest) GetRestoreId() string {
+	if x != nil {
+		return x.RestoreId
+	}
+	return ""
+}
+
+func (x *ListRestoreItemsRequest) GetAfterOrdinal() int64 {
+	if x != nil {
+		return x.AfterOrdinal
+	}
+	return 0
+}
+
+func (x *ListRestoreItemsRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type RestoreItem struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ordinal       int64                  `protobuf:"varint,1,opt,name=ordinal,proto3" json:"ordinal,omitempty"`
+	EntryId       string                 `protobuf:"bytes,2,opt,name=entry_id,json=entryId,proto3" json:"entry_id,omitempty"`
+	VersionId     string                 `protobuf:"bytes,3,opt,name=version_id,json=versionId,proto3" json:"version_id,omitempty"`
+	PathKey       string                 `protobuf:"bytes,4,opt,name=path_key,json=pathKey,proto3" json:"path_key,omitempty"`
+	RelativePath  string                 `protobuf:"bytes,5,opt,name=relative_path,json=relativePath,proto3" json:"relative_path,omitempty"`
+	ObjectSha256  []byte                 `protobuf:"bytes,6,opt,name=object_sha256,json=objectSha256,proto3" json:"object_sha256,omitempty"`
+	Size          int64                  `protobuf:"varint,7,opt,name=size,proto3" json:"size,omitempty"`
+	MtimeUnixNano int64                  `protobuf:"varint,8,opt,name=mtime_unix_nano,json=mtimeUnixNano,proto3" json:"mtime_unix_nano,omitempty"`
+	PortableMode  uint32                 `protobuf:"varint,9,opt,name=portable_mode,json=portableMode,proto3" json:"portable_mode,omitempty"`
+	State         RestoreItemState       `protobuf:"varint,10,opt,name=state,proto3,enum=sync.v1.RestoreItemState" json:"state,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,11,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RestoreItem) Reset() {
+	*x = RestoreItem{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RestoreItem) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestoreItem) ProtoMessage() {}
+
+func (x *RestoreItem) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestoreItem.ProtoReflect.Descriptor instead.
+func (*RestoreItem) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *RestoreItem) GetOrdinal() int64 {
+	if x != nil {
+		return x.Ordinal
+	}
+	return 0
+}
+
+func (x *RestoreItem) GetEntryId() string {
+	if x != nil {
+		return x.EntryId
+	}
+	return ""
+}
+
+func (x *RestoreItem) GetVersionId() string {
+	if x != nil {
+		return x.VersionId
+	}
+	return ""
+}
+
+func (x *RestoreItem) GetPathKey() string {
+	if x != nil {
+		return x.PathKey
+	}
+	return ""
+}
+
+func (x *RestoreItem) GetRelativePath() string {
+	if x != nil {
+		return x.RelativePath
+	}
+	return ""
+}
+
+func (x *RestoreItem) GetObjectSha256() []byte {
+	if x != nil {
+		return x.ObjectSha256
+	}
+	return nil
+}
+
+func (x *RestoreItem) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *RestoreItem) GetMtimeUnixNano() int64 {
+	if x != nil {
+		return x.MtimeUnixNano
+	}
+	return 0
+}
+
+func (x *RestoreItem) GetPortableMode() uint32 {
+	if x != nil {
+		return x.PortableMode
+	}
+	return 0
+}
+
+func (x *RestoreItem) GetState() RestoreItemState {
+	if x != nil {
+		return x.State
+	}
+	return RestoreItemState_RESTORE_ITEM_STATE_UNSPECIFIED
+}
+
+func (x *RestoreItem) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+type ListRestoreItemsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Job           *RestoreJob            `protobuf:"bytes,1,opt,name=job,proto3" json:"job,omitempty"`
+	Items         []*RestoreItem         `protobuf:"bytes,2,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRestoreItemsResponse) Reset() {
+	*x = ListRestoreItemsResponse{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRestoreItemsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRestoreItemsResponse) ProtoMessage() {}
+
+func (x *ListRestoreItemsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRestoreItemsResponse.ProtoReflect.Descriptor instead.
+func (*ListRestoreItemsResponse) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *ListRestoreItemsResponse) GetJob() *RestoreJob {
+	if x != nil {
+		return x.Job
+	}
+	return nil
+}
+
+func (x *ListRestoreItemsResponse) GetItems() []*RestoreItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type ReportRestoreItemRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RestoreId     string                 `protobuf:"bytes,1,opt,name=restore_id,json=restoreId,proto3" json:"restore_id,omitempty"`
+	Ordinal       int64                  `protobuf:"varint,2,opt,name=ordinal,proto3" json:"ordinal,omitempty"`
+	State         RestoreItemState       `protobuf:"varint,3,opt,name=state,proto3,enum=sync.v1.RestoreItemState" json:"state,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,4,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReportRestoreItemRequest) Reset() {
+	*x = ReportRestoreItemRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReportRestoreItemRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReportRestoreItemRequest) ProtoMessage() {}
+
+func (x *ReportRestoreItemRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReportRestoreItemRequest.ProtoReflect.Descriptor instead.
+func (*ReportRestoreItemRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *ReportRestoreItemRequest) GetRestoreId() string {
+	if x != nil {
+		return x.RestoreId
+	}
+	return ""
+}
+
+func (x *ReportRestoreItemRequest) GetOrdinal() int64 {
+	if x != nil {
+		return x.Ordinal
+	}
+	return 0
+}
+
+func (x *ReportRestoreItemRequest) GetState() RestoreItemState {
+	if x != nil {
+		return x.State
+	}
+	return RestoreItemState_RESTORE_ITEM_STATE_UNSPECIFIED
+}
+
+func (x *ReportRestoreItemRequest) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+type FinishRestoreRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RestoreId     string                 `protobuf:"bytes,1,opt,name=restore_id,json=restoreId,proto3" json:"restore_id,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	ErrorMessage  string                 `protobuf:"bytes,3,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FinishRestoreRequest) Reset() {
+	*x = FinishRestoreRequest{}
+	mi := &file_api_sync_v1_sync_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FinishRestoreRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FinishRestoreRequest) ProtoMessage() {}
+
+func (x *FinishRestoreRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_sync_v1_sync_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FinishRestoreRequest.ProtoReflect.Descriptor instead.
+func (*FinishRestoreRequest) Descriptor() ([]byte, []int) {
+	return file_api_sync_v1_sync_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *FinishRestoreRequest) GetRestoreId() string {
+	if x != nil {
+		return x.RestoreId
+	}
+	return ""
+}
+
+func (x *FinishRestoreRequest) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *FinishRestoreRequest) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
 var File_api_sync_v1_sync_proto protoreflect.FileDescriptor
 
 const file_api_sync_v1_sync_proto_rawDesc = "" +
@@ -1219,10 +2405,11 @@ const file_api_sync_v1_sync_proto_rawDesc = "" +
 	"\x15acknowledged_sequence\x18\x02 \x01(\x03R\x14acknowledgedSequence\"S\n" +
 	"\vServerFrame\x12\x1b\n" +
 	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x12'\n" +
-	"\x0flatest_sequence\x18\x02 \x01(\x03R\x0elatestSequence\"A\n" +
+	"\x0flatest_sequence\x18\x02 \x01(\x03R\x0elatestSequence\"^\n" +
 	"\x0fDownloadRequest\x12\x16\n" +
 	"\x06sha256\x18\x01 \x01(\fR\x06sha256\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x03R\x06offset\";\n" +
+	"\x06offset\x18\x02 \x01(\x03R\x06offset\x12\x1b\n" +
+	"\tfolder_id\x18\x03 \x01(\tR\bfolderId\";\n" +
 	"\rDownloadChunk\x12\x16\n" +
 	"\x06offset\x18\x01 \x01(\x03R\x06offset\x12\x12\n" +
 	"\x04data\x18\x02 \x01(\fR\x04data\"n\n" +
@@ -1247,7 +2434,98 @@ const file_api_sync_v1_sync_proto_rawDesc = "" +
 	"\x0flatest_sequence\x18\x02 \x01(\x03R\x0elatestSequence\"L\n" +
 	"\x11AckChangesRequest\x12\x1b\n" +
 	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x12\x1a\n" +
-	"\bsequence\x18\x02 \x01(\x03R\bsequence*\x8a\x01\n" +
+	"\bsequence\x18\x02 \x01(\x03R\bsequence\"\x8d\x01\n" +
+	"\x17CreateEnrollmentRequest\x12\x1b\n" +
+	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x12'\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x13.sync.v1.FolderRoleR\x04role\x12,\n" +
+	"\x12expires_in_seconds\x18\x03 \x01(\x03R\x10expiresInSeconds\"\xeb\x01\n" +
+	"\x18CreateEnrollmentResponse\x12#\n" +
+	"\renrollment_id\x18\x01 \x01(\tR\fenrollmentId\x12)\n" +
+	"\x10enrollment_token\x18\x02 \x01(\tR\x0fenrollmentToken\x12\x1b\n" +
+	"\tfolder_id\x18\x03 \x01(\tR\bfolderId\x12'\n" +
+	"\x04role\x18\x04 \x01(\x0e2\x13.sync.v1.FolderRoleR\x04role\x129\n" +
+	"\n" +
+	"expires_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\xaa\x01\n" +
+	"\x13EnrollDeviceRequest\x12)\n" +
+	"\x10enrollment_token\x18\x01 \x01(\tR\x0fenrollmentToken\x12\x1f\n" +
+	"\vdevice_name\x18\x02 \x01(\tR\n" +
+	"deviceName\x12\x1a\n" +
+	"\bplatform\x18\x03 \x01(\tR\bplatform\x12+\n" +
+	"\x11capabilities_json\x18\x04 \x01(\tR\x10capabilitiesJson\"\x9c\x01\n" +
+	"\x14EnrollDeviceResponse\x12\x1b\n" +
+	"\tdevice_id\x18\x01 \x01(\tR\bdeviceId\x12!\n" +
+	"\fdevice_token\x18\x02 \x01(\tR\vdeviceToken\x12\x1b\n" +
+	"\tfolder_id\x18\x03 \x01(\tR\bfolderId\x12'\n" +
+	"\x04role\x18\x04 \x01(\x0e2\x13.sync.v1.FolderRoleR\x04role\"5\n" +
+	"\x16GetFolderPolicyRequest\x12\x1b\n" +
+	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\"\xa3\x01\n" +
+	"\x19UpdateFolderPolicyRequest\x12\x1b\n" +
+	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x122\n" +
+	"\x15safety_window_seconds\x18\x02 \x01(\x03R\x13safetyWindowSeconds\x125\n" +
+	"\x17gc_grace_period_seconds\x18\x03 \x01(\x03R\x14gcGracePeriodSeconds\"\xed\x01\n" +
+	"\fFolderPolicy\x12\x1b\n" +
+	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x122\n" +
+	"\x15safety_window_seconds\x18\x02 \x01(\x03R\x13safetyWindowSeconds\x125\n" +
+	"\x17gc_grace_period_seconds\x18\x03 \x01(\x03R\x14gcGracePeriodSeconds\x12\x1a\n" +
+	"\brevision\x18\x04 \x01(\x03R\brevision\x129\n" +
+	"\n" +
+	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x8e\x01\n" +
+	"\x13StartRestoreRequest\x12\x1b\n" +
+	"\tfolder_id\x18\x01 \x01(\tR\bfolderId\x12+\n" +
+	"\x11snapshot_sequence\x18\x02 \x01(\x03R\x10snapshotSequence\x12-\n" +
+	"\x12overwrite_existing\x18\x03 \x01(\bR\x11overwriteExisting\"\xa8\x04\n" +
+	"\n" +
+	"RestoreJob\x12\x1d\n" +
+	"\n" +
+	"restore_id\x18\x01 \x01(\tR\trestoreId\x12\x1b\n" +
+	"\tfolder_id\x18\x02 \x01(\tR\bfolderId\x12(\n" +
+	"\x10target_device_id\x18\x03 \x01(\tR\x0etargetDeviceId\x12+\n" +
+	"\x11snapshot_sequence\x18\x04 \x01(\x03R\x10snapshotSequence\x12+\n" +
+	"\x05state\x18\x05 \x01(\x0e2\x15.sync.v1.RestoreStateR\x05state\x12-\n" +
+	"\x12overwrite_existing\x18\x06 \x01(\bR\x11overwriteExisting\x12\x1f\n" +
+	"\vtotal_items\x18\a \x01(\x03R\n" +
+	"totalItems\x12#\n" +
+	"\rapplied_items\x18\b \x01(\x03R\fappliedItems\x12#\n" +
+	"\rskipped_items\x18\t \x01(\x03R\fskippedItems\x12!\n" +
+	"\ffailed_items\x18\n" +
+	" \x01(\x03R\vfailedItems\x12#\n" +
+	"\rerror_message\x18\v \x01(\tR\ferrorMessage\x129\n" +
+	"\n" +
+	"created_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12=\n" +
+	"\fcompleted_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\vcompletedAt\"s\n" +
+	"\x17ListRestoreItemsRequest\x12\x1d\n" +
+	"\n" +
+	"restore_id\x18\x01 \x01(\tR\trestoreId\x12#\n" +
+	"\rafter_ordinal\x18\x02 \x01(\x03R\fafterOrdinal\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\"\xfd\x02\n" +
+	"\vRestoreItem\x12\x18\n" +
+	"\aordinal\x18\x01 \x01(\x03R\aordinal\x12\x19\n" +
+	"\bentry_id\x18\x02 \x01(\tR\aentryId\x12\x1d\n" +
+	"\n" +
+	"version_id\x18\x03 \x01(\tR\tversionId\x12\x19\n" +
+	"\bpath_key\x18\x04 \x01(\tR\apathKey\x12#\n" +
+	"\rrelative_path\x18\x05 \x01(\tR\frelativePath\x12#\n" +
+	"\robject_sha256\x18\x06 \x01(\fR\fobjectSha256\x12\x12\n" +
+	"\x04size\x18\a \x01(\x03R\x04size\x12&\n" +
+	"\x0fmtime_unix_nano\x18\b \x01(\x03R\rmtimeUnixNano\x12#\n" +
+	"\rportable_mode\x18\t \x01(\rR\fportableMode\x12/\n" +
+	"\x05state\x18\n" +
+	" \x01(\x0e2\x19.sync.v1.RestoreItemStateR\x05state\x12#\n" +
+	"\rerror_message\x18\v \x01(\tR\ferrorMessage\"m\n" +
+	"\x18ListRestoreItemsResponse\x12%\n" +
+	"\x03job\x18\x01 \x01(\v2\x13.sync.v1.RestoreJobR\x03job\x12*\n" +
+	"\x05items\x18\x02 \x03(\v2\x14.sync.v1.RestoreItemR\x05items\"\xa9\x01\n" +
+	"\x18ReportRestoreItemRequest\x12\x1d\n" +
+	"\n" +
+	"restore_id\x18\x01 \x01(\tR\trestoreId\x12\x18\n" +
+	"\aordinal\x18\x02 \x01(\x03R\aordinal\x12/\n" +
+	"\x05state\x18\x03 \x01(\x0e2\x19.sync.v1.RestoreItemStateR\x05state\x12#\n" +
+	"\rerror_message\x18\x04 \x01(\tR\ferrorMessage\"t\n" +
+	"\x14FinishRestoreRequest\x12\x1d\n" +
+	"\n" +
+	"restore_id\x18\x01 \x01(\tR\trestoreId\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12#\n" +
+	"\rerror_message\x18\x03 \x01(\tR\ferrorMessage*\x8a\x01\n" +
 	"\n" +
 	"ChangeKind\x12\x1b\n" +
 	"\x17CHANGE_KIND_UNSPECIFIED\x10\x00\x12\x16\n" +
@@ -1264,7 +2542,25 @@ const file_api_sync_v1_sync_proto_rawDesc = "" +
 	"\x1cCOMMIT_DISPOSITION_COMMITTED\x10\x01\x12(\n" +
 	"$COMMIT_DISPOSITION_IDEMPOTENT_REPLAY\x10\x02\x12\"\n" +
 	"\x1eCOMMIT_DISPOSITION_QUARANTINED\x10\x03\x12$\n" +
-	" COMMIT_DISPOSITION_CONFLICT_COPY\x10\x042\xe5\x03\n" +
+	" COMMIT_DISPOSITION_CONFLICT_COPY\x10\x04*x\n" +
+	"\n" +
+	"FolderRole\x12\x1b\n" +
+	"\x17FOLDER_ROLE_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12FOLDER_ROLE_READER\x10\x01\x12\x16\n" +
+	"\x12FOLDER_ROLE_WRITER\x10\x02\x12\x1d\n" +
+	"\x19FOLDER_ROLE_RESTORE_ADMIN\x10\x03*\x98\x01\n" +
+	"\fRestoreState\x12\x1d\n" +
+	"\x19RESTORE_STATE_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13RESTORE_STATE_READY\x10\x01\x12\x19\n" +
+	"\x15RESTORE_STATE_RUNNING\x10\x02\x12\x1b\n" +
+	"\x17RESTORE_STATE_COMPLETED\x10\x03\x12\x18\n" +
+	"\x14RESTORE_STATE_FAILED\x10\x04*\xb5\x01\n" +
+	"\x10RestoreItemState\x12\"\n" +
+	"\x1eRESTORE_ITEM_STATE_UNSPECIFIED\x10\x00\x12\x1e\n" +
+	"\x1aRESTORE_ITEM_STATE_PENDING\x10\x01\x12\x1e\n" +
+	"\x1aRESTORE_ITEM_STATE_APPLIED\x10\x02\x12\x1e\n" +
+	"\x1aRESTORE_ITEM_STATE_SKIPPED\x10\x03\x12\x1d\n" +
+	"\x19RESTORE_ITEM_STATE_FAILED\x10\x042\xd5\b\n" +
 	"\vSyncService\x12:\n" +
 	"\bOpenSync\x12\x14.sync.v1.ClientFrame\x1a\x14.sync.v1.ServerFrame(\x010\x01\x12H\n" +
 	"\vBeginUpload\x12\x1b.sync.v1.BeginUploadRequest\x1a\x1c.sync.v1.BeginUploadResponse\x127\n" +
@@ -1273,7 +2569,15 @@ const file_api_sync_v1_sync_proto_rawDesc = "" +
 	"\bDownload\x12\x18.sync.v1.DownloadRequest\x1a\x16.sync.v1.DownloadChunk0\x01\x12H\n" +
 	"\vListChanges\x12\x1b.sync.v1.ListChangesRequest\x1a\x1c.sync.v1.ListChangesResponse\x12@\n" +
 	"\n" +
-	"AckChanges\x12\x1a.sync.v1.AckChangesRequest\x1a\x16.google.protobuf.EmptyB3Z1github.com/hawoond/remote-sync/api/sync/v1;syncv1b\x06proto3"
+	"AckChanges\x12\x1a.sync.v1.AckChangesRequest\x1a\x16.google.protobuf.Empty\x12W\n" +
+	"\x10CreateEnrollment\x12 .sync.v1.CreateEnrollmentRequest\x1a!.sync.v1.CreateEnrollmentResponse\x12K\n" +
+	"\fEnrollDevice\x12\x1c.sync.v1.EnrollDeviceRequest\x1a\x1d.sync.v1.EnrollDeviceResponse\x12I\n" +
+	"\x0fGetFolderPolicy\x12\x1f.sync.v1.GetFolderPolicyRequest\x1a\x15.sync.v1.FolderPolicy\x12O\n" +
+	"\x12UpdateFolderPolicy\x12\".sync.v1.UpdateFolderPolicyRequest\x1a\x15.sync.v1.FolderPolicy\x12A\n" +
+	"\fStartRestore\x12\x1c.sync.v1.StartRestoreRequest\x1a\x13.sync.v1.RestoreJob\x12W\n" +
+	"\x10ListRestoreItems\x12 .sync.v1.ListRestoreItemsRequest\x1a!.sync.v1.ListRestoreItemsResponse\x12K\n" +
+	"\x11ReportRestoreItem\x12!.sync.v1.ReportRestoreItemRequest\x1a\x13.sync.v1.RestoreJob\x12C\n" +
+	"\rFinishRestore\x12\x1d.sync.v1.FinishRestoreRequest\x1a\x13.sync.v1.RestoreJobB3Z1github.com/hawoond/remote-sync/api/sync/v1;syncv1b\x06proto3"
 
 var (
 	file_api_sync_v1_sync_proto_rawDescOnce sync.Once
@@ -1287,56 +2591,101 @@ func file_api_sync_v1_sync_proto_rawDescGZIP() []byte {
 	return file_api_sync_v1_sync_proto_rawDescData
 }
 
-var file_api_sync_v1_sync_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_api_sync_v1_sync_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_api_sync_v1_sync_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_api_sync_v1_sync_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_api_sync_v1_sync_proto_goTypes = []any{
-	(ChangeKind)(0),               // 0: sync.v1.ChangeKind
-	(UploadDisposition)(0),        // 1: sync.v1.UploadDisposition
-	(CommitDisposition)(0),        // 2: sync.v1.CommitDisposition
-	(*BeginUploadRequest)(nil),    // 3: sync.v1.BeginUploadRequest
-	(*BeginUploadResponse)(nil),   // 4: sync.v1.BeginUploadResponse
-	(*UploadChunk)(nil),           // 5: sync.v1.UploadChunk
-	(*UploadResult)(nil),          // 6: sync.v1.UploadResult
-	(*CommitChangeRequest)(nil),   // 7: sync.v1.CommitChangeRequest
-	(*CommitChangeResponse)(nil),  // 8: sync.v1.CommitChangeResponse
-	(*ClientFrame)(nil),           // 9: sync.v1.ClientFrame
-	(*ServerFrame)(nil),           // 10: sync.v1.ServerFrame
-	(*DownloadRequest)(nil),       // 11: sync.v1.DownloadRequest
-	(*DownloadChunk)(nil),         // 12: sync.v1.DownloadChunk
-	(*ListChangesRequest)(nil),    // 13: sync.v1.ListChangesRequest
-	(*Change)(nil),                // 14: sync.v1.Change
-	(*ListChangesResponse)(nil),   // 15: sync.v1.ListChangesResponse
-	(*AckChangesRequest)(nil),     // 16: sync.v1.AckChangesRequest
-	(*timestamppb.Timestamp)(nil), // 17: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),         // 18: google.protobuf.Empty
+	(ChangeKind)(0),                   // 0: sync.v1.ChangeKind
+	(UploadDisposition)(0),            // 1: sync.v1.UploadDisposition
+	(CommitDisposition)(0),            // 2: sync.v1.CommitDisposition
+	(FolderRole)(0),                   // 3: sync.v1.FolderRole
+	(RestoreState)(0),                 // 4: sync.v1.RestoreState
+	(RestoreItemState)(0),             // 5: sync.v1.RestoreItemState
+	(*BeginUploadRequest)(nil),        // 6: sync.v1.BeginUploadRequest
+	(*BeginUploadResponse)(nil),       // 7: sync.v1.BeginUploadResponse
+	(*UploadChunk)(nil),               // 8: sync.v1.UploadChunk
+	(*UploadResult)(nil),              // 9: sync.v1.UploadResult
+	(*CommitChangeRequest)(nil),       // 10: sync.v1.CommitChangeRequest
+	(*CommitChangeResponse)(nil),      // 11: sync.v1.CommitChangeResponse
+	(*ClientFrame)(nil),               // 12: sync.v1.ClientFrame
+	(*ServerFrame)(nil),               // 13: sync.v1.ServerFrame
+	(*DownloadRequest)(nil),           // 14: sync.v1.DownloadRequest
+	(*DownloadChunk)(nil),             // 15: sync.v1.DownloadChunk
+	(*ListChangesRequest)(nil),        // 16: sync.v1.ListChangesRequest
+	(*Change)(nil),                    // 17: sync.v1.Change
+	(*ListChangesResponse)(nil),       // 18: sync.v1.ListChangesResponse
+	(*AckChangesRequest)(nil),         // 19: sync.v1.AckChangesRequest
+	(*CreateEnrollmentRequest)(nil),   // 20: sync.v1.CreateEnrollmentRequest
+	(*CreateEnrollmentResponse)(nil),  // 21: sync.v1.CreateEnrollmentResponse
+	(*EnrollDeviceRequest)(nil),       // 22: sync.v1.EnrollDeviceRequest
+	(*EnrollDeviceResponse)(nil),      // 23: sync.v1.EnrollDeviceResponse
+	(*GetFolderPolicyRequest)(nil),    // 24: sync.v1.GetFolderPolicyRequest
+	(*UpdateFolderPolicyRequest)(nil), // 25: sync.v1.UpdateFolderPolicyRequest
+	(*FolderPolicy)(nil),              // 26: sync.v1.FolderPolicy
+	(*StartRestoreRequest)(nil),       // 27: sync.v1.StartRestoreRequest
+	(*RestoreJob)(nil),                // 28: sync.v1.RestoreJob
+	(*ListRestoreItemsRequest)(nil),   // 29: sync.v1.ListRestoreItemsRequest
+	(*RestoreItem)(nil),               // 30: sync.v1.RestoreItem
+	(*ListRestoreItemsResponse)(nil),  // 31: sync.v1.ListRestoreItemsResponse
+	(*ReportRestoreItemRequest)(nil),  // 32: sync.v1.ReportRestoreItemRequest
+	(*FinishRestoreRequest)(nil),      // 33: sync.v1.FinishRestoreRequest
+	(*timestamppb.Timestamp)(nil),     // 34: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),             // 35: google.protobuf.Empty
 }
 var file_api_sync_v1_sync_proto_depIdxs = []int32{
 	0,  // 0: sync.v1.BeginUploadRequest.kind:type_name -> sync.v1.ChangeKind
 	1,  // 1: sync.v1.BeginUploadResponse.disposition:type_name -> sync.v1.UploadDisposition
-	17, // 2: sync.v1.BeginUploadResponse.expires_at:type_name -> google.protobuf.Timestamp
+	34, // 2: sync.v1.BeginUploadResponse.expires_at:type_name -> google.protobuf.Timestamp
 	0,  // 3: sync.v1.CommitChangeRequest.kind:type_name -> sync.v1.ChangeKind
 	2,  // 4: sync.v1.CommitChangeResponse.disposition:type_name -> sync.v1.CommitDisposition
 	0,  // 5: sync.v1.Change.kind:type_name -> sync.v1.ChangeKind
-	14, // 6: sync.v1.ListChangesResponse.changes:type_name -> sync.v1.Change
-	9,  // 7: sync.v1.SyncService.OpenSync:input_type -> sync.v1.ClientFrame
-	3,  // 8: sync.v1.SyncService.BeginUpload:input_type -> sync.v1.BeginUploadRequest
-	5,  // 9: sync.v1.SyncService.Upload:input_type -> sync.v1.UploadChunk
-	7,  // 10: sync.v1.SyncService.CommitChange:input_type -> sync.v1.CommitChangeRequest
-	11, // 11: sync.v1.SyncService.Download:input_type -> sync.v1.DownloadRequest
-	13, // 12: sync.v1.SyncService.ListChanges:input_type -> sync.v1.ListChangesRequest
-	16, // 13: sync.v1.SyncService.AckChanges:input_type -> sync.v1.AckChangesRequest
-	10, // 14: sync.v1.SyncService.OpenSync:output_type -> sync.v1.ServerFrame
-	4,  // 15: sync.v1.SyncService.BeginUpload:output_type -> sync.v1.BeginUploadResponse
-	6,  // 16: sync.v1.SyncService.Upload:output_type -> sync.v1.UploadResult
-	8,  // 17: sync.v1.SyncService.CommitChange:output_type -> sync.v1.CommitChangeResponse
-	12, // 18: sync.v1.SyncService.Download:output_type -> sync.v1.DownloadChunk
-	15, // 19: sync.v1.SyncService.ListChanges:output_type -> sync.v1.ListChangesResponse
-	18, // 20: sync.v1.SyncService.AckChanges:output_type -> google.protobuf.Empty
-	14, // [14:21] is the sub-list for method output_type
-	7,  // [7:14] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	17, // 6: sync.v1.ListChangesResponse.changes:type_name -> sync.v1.Change
+	3,  // 7: sync.v1.CreateEnrollmentRequest.role:type_name -> sync.v1.FolderRole
+	3,  // 8: sync.v1.CreateEnrollmentResponse.role:type_name -> sync.v1.FolderRole
+	34, // 9: sync.v1.CreateEnrollmentResponse.expires_at:type_name -> google.protobuf.Timestamp
+	3,  // 10: sync.v1.EnrollDeviceResponse.role:type_name -> sync.v1.FolderRole
+	34, // 11: sync.v1.FolderPolicy.updated_at:type_name -> google.protobuf.Timestamp
+	4,  // 12: sync.v1.RestoreJob.state:type_name -> sync.v1.RestoreState
+	34, // 13: sync.v1.RestoreJob.created_at:type_name -> google.protobuf.Timestamp
+	34, // 14: sync.v1.RestoreJob.completed_at:type_name -> google.protobuf.Timestamp
+	5,  // 15: sync.v1.RestoreItem.state:type_name -> sync.v1.RestoreItemState
+	28, // 16: sync.v1.ListRestoreItemsResponse.job:type_name -> sync.v1.RestoreJob
+	30, // 17: sync.v1.ListRestoreItemsResponse.items:type_name -> sync.v1.RestoreItem
+	5,  // 18: sync.v1.ReportRestoreItemRequest.state:type_name -> sync.v1.RestoreItemState
+	12, // 19: sync.v1.SyncService.OpenSync:input_type -> sync.v1.ClientFrame
+	6,  // 20: sync.v1.SyncService.BeginUpload:input_type -> sync.v1.BeginUploadRequest
+	8,  // 21: sync.v1.SyncService.Upload:input_type -> sync.v1.UploadChunk
+	10, // 22: sync.v1.SyncService.CommitChange:input_type -> sync.v1.CommitChangeRequest
+	14, // 23: sync.v1.SyncService.Download:input_type -> sync.v1.DownloadRequest
+	16, // 24: sync.v1.SyncService.ListChanges:input_type -> sync.v1.ListChangesRequest
+	19, // 25: sync.v1.SyncService.AckChanges:input_type -> sync.v1.AckChangesRequest
+	20, // 26: sync.v1.SyncService.CreateEnrollment:input_type -> sync.v1.CreateEnrollmentRequest
+	22, // 27: sync.v1.SyncService.EnrollDevice:input_type -> sync.v1.EnrollDeviceRequest
+	24, // 28: sync.v1.SyncService.GetFolderPolicy:input_type -> sync.v1.GetFolderPolicyRequest
+	25, // 29: sync.v1.SyncService.UpdateFolderPolicy:input_type -> sync.v1.UpdateFolderPolicyRequest
+	27, // 30: sync.v1.SyncService.StartRestore:input_type -> sync.v1.StartRestoreRequest
+	29, // 31: sync.v1.SyncService.ListRestoreItems:input_type -> sync.v1.ListRestoreItemsRequest
+	32, // 32: sync.v1.SyncService.ReportRestoreItem:input_type -> sync.v1.ReportRestoreItemRequest
+	33, // 33: sync.v1.SyncService.FinishRestore:input_type -> sync.v1.FinishRestoreRequest
+	13, // 34: sync.v1.SyncService.OpenSync:output_type -> sync.v1.ServerFrame
+	7,  // 35: sync.v1.SyncService.BeginUpload:output_type -> sync.v1.BeginUploadResponse
+	9,  // 36: sync.v1.SyncService.Upload:output_type -> sync.v1.UploadResult
+	11, // 37: sync.v1.SyncService.CommitChange:output_type -> sync.v1.CommitChangeResponse
+	15, // 38: sync.v1.SyncService.Download:output_type -> sync.v1.DownloadChunk
+	18, // 39: sync.v1.SyncService.ListChanges:output_type -> sync.v1.ListChangesResponse
+	35, // 40: sync.v1.SyncService.AckChanges:output_type -> google.protobuf.Empty
+	21, // 41: sync.v1.SyncService.CreateEnrollment:output_type -> sync.v1.CreateEnrollmentResponse
+	23, // 42: sync.v1.SyncService.EnrollDevice:output_type -> sync.v1.EnrollDeviceResponse
+	26, // 43: sync.v1.SyncService.GetFolderPolicy:output_type -> sync.v1.FolderPolicy
+	26, // 44: sync.v1.SyncService.UpdateFolderPolicy:output_type -> sync.v1.FolderPolicy
+	28, // 45: sync.v1.SyncService.StartRestore:output_type -> sync.v1.RestoreJob
+	31, // 46: sync.v1.SyncService.ListRestoreItems:output_type -> sync.v1.ListRestoreItemsResponse
+	28, // 47: sync.v1.SyncService.ReportRestoreItem:output_type -> sync.v1.RestoreJob
+	28, // 48: sync.v1.SyncService.FinishRestore:output_type -> sync.v1.RestoreJob
+	34, // [34:49] is the sub-list for method output_type
+	19, // [19:34] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_api_sync_v1_sync_proto_init() }
@@ -1354,8 +2703,8 @@ func file_api_sync_v1_sync_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_sync_v1_sync_proto_rawDesc), len(file_api_sync_v1_sync_proto_rawDesc)),
-			NumEnums:      3,
-			NumMessages:   14,
+			NumEnums:      6,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

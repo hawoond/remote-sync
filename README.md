@@ -273,6 +273,102 @@ are not reported because Remote Sync validates Git worktrees.
   unavailable. The agent stops instead of treating the missing root as a mass
   deletion.
 
+### Enroll another device
+
+The bootstrap device has the `RESTORE_ADMIN` role. Build the binaries and use
+that device's environment to create a short-lived, one-time enrollment token:
+
+```bash
+make build
+
+export SYNC_SERVER_ADDRESS=127.0.0.1:8443
+export SYNC_FOLDER_ID=681f7dd7-559b-4fab-8734-41b00f663425
+export SYNC_DEVICE_TOKEN='existing-device-token'
+export ALLOW_INSECURE=true
+
+./bin/sync-agent enrollment create --role writer --expires 15m
+```
+
+Transfer only the returned `enrollment_token` to the new device. Enroll there
+without exposing the token in the process list:
+
+```bash
+export SYNC_SERVER_ADDRESS=server.example.com:8443
+export SYNC_ENROLLMENT_TOKEN='one-time-enrollment-token'
+
+./bin/sync-agent enroll --name laptop --platform linux/amd64
+```
+
+The command returns a new `device_id`, `device_token`, and `folder_id` as JSON.
+Store the device token in a secret manager and set `SYNC_DEVICE_TOKEN` and
+`SYNC_FOLDER_ID` before starting that device's agent. Enrollment tokens are
+stored as SHA-256 digests, expire automatically, and cannot be used twice.
+Device bearer tokens are also stored only as digests.
+
+Available roles:
+
+- `reader`: restore and download access without backup writes.
+- `writer`: read, restore, and backup-write access.
+- `restore-admin`: writer access plus enrollment-token and lifecycle-policy
+  administration.
+
+### Restore a folder
+
+Restore always creates a persistent server-side job and an immutable manifest
+at the selected folder sequence. The client downloads each object, verifies its
+SHA-256 and size, publishes it with an atomic rename, restores portable mode and
+mtime, and records the server version in the local SQLite state.
+
+```bash
+# Latest server sequence into an empty directory.
+./bin/sync-agent restore --target /srv/recovered-project
+
+# Historical sequence.
+./bin/sync-agent restore --target /srv/recovered-project --sequence 420
+
+# Explicitly replace existing regular files.
+./bin/sync-agent restore --target /srv/recovered-project --overwrite
+
+# Continue an interrupted job using the ID printed when it was created.
+./bin/sync-agent restore \
+  --target /srv/recovered-project \
+  --resume 2f32b0c2-1cef-4c58-aeca-70124c01372e
+```
+
+Without `--overwrite`, differing existing files are reported as skipped.
+Directories, symlinks, and other non-regular paths are never replaced.
+Restoration does not delete files that are absent from the manifest. Stop a
+running agent before restoring into that agent's active root. A historical
+sequence older than the folder's retained restore floor is rejected instead of
+producing a partial manifest.
+
+### Safety window and garbage collection
+
+Each folder starts with a 30-day safety window and a 24-hour two-phase deletion
+grace period. A restore administrator can inspect or change both:
+
+```bash
+./bin/sync-agent policy get
+
+./bin/sync-agent policy set \
+  --safety-window 720h \
+  --gc-grace-period 24h
+```
+
+The collector prunes only superseded, non-head versions that satisfy every
+condition below:
+
+- The version has remained superseded for at least the folder's safety window.
+- Every active reader device has acknowledged a sequence at or beyond it.
+- No active restore job or pinned snapshot needs the version.
+- The object is not referenced by another version or in-flight operation.
+
+An unreferenced object first becomes `PENDING_DELETE`; its blob is removed only
+after the folder's GC grace period and a final reference check. Expired upload
+sessions and their reserved quota are also reclaimed; failed temporary-file
+cleanup remains retryable until it is acknowledged. `GC_ENABLED`,
+`GC_INTERVAL`, and `GC_BATCH_SIZE` control the bounded background collector.
+
 ### Runtime configuration
 
 Docker setup variables:
@@ -298,8 +394,8 @@ Server variables:
 | --- | --- | --- | --- |
 | `DATABASE_URL` | Yes | — | PostgreSQL connection string |
 | `BLOB_ROOT` | Yes | — | Local immutable blob-store root |
-| `SYNC_DEVICE_ID` | Yes | — | Authorized device UUID |
-| `SYNC_DEVICE_TOKEN` | Yes | — | Device bearer token, at least 32 characters |
+| `SYNC_DEVICE_ID` | With bootstrap or credential update | — | Configured device UUID |
+| `SYNC_DEVICE_TOKEN` | With bootstrap or credential update | — | Device bearer token, at least 32 characters |
 | `LISTEN_ADDR` | No | `:8443` | gRPC listen address |
 | `TLS_CERT_FILE` | Production | — | TLS certificate chain |
 | `TLS_KEY_FILE` | Production | — | TLS private key |
@@ -307,6 +403,9 @@ Server variables:
 | `DEV_BOOTSTRAP` | No | `false` | Create local development user/device/folder records |
 | `SYNC_USER_ID` | With bootstrap | — | Development user UUID |
 | `SYNC_FOLDER_ID` | With bootstrap | — | Development folder UUID |
+| `GC_ENABLED` | No | `true` | Run lifecycle garbage collection |
+| `GC_INTERVAL` | No | `1h` | Collection interval |
+| `GC_BATCH_SIZE` | No | `100` | Maximum records per collection phase, up to 1000 |
 
 The server also accepts `MAX_FILE_SIZE_BYTES`,
 `MAX_FOLDER_LIVE_SIZE_BYTES`, `MAX_USER_LIVE_SIZE_BYTES`,
@@ -319,6 +418,7 @@ Agent variables:
 | --- | --- | --- | --- |
 | `SYNC_FOLDER_ID` | Yes | — | Server-authorized folder UUID |
 | `SYNC_DEVICE_TOKEN` | Yes | — | Device bearer token, at least 32 characters |
+| `SYNC_ENROLLMENT_TOKEN` | Enrollment only | — | One-time token consumed by `sync-agent enroll` |
 | `SYNC_ROOT` | No | — | Explicit root; bypasses discovery |
 | `SYNC_WORKTREE` | Non-interactive discovery | — | Discovered ID or absolute path |
 | `SYNC_WORKTREE_PROVIDERS` | No | `all` | Provider filter |
@@ -599,6 +699,100 @@ $env:SYNC_DISCOVERY_PROJECT_ROOTS = 'D:\Projects\Storefront;D:\Projects\Payments
 - 에이전트 실행 중 worktree를 삭제하거나 보관해 루트가 사라지면 대량 삭제로
   간주하지 않고 에이전트가 중단됩니다.
 
+### 다른 기기 등록
+
+Bootstrap 기기에는 `RESTORE_ADMIN` 역할이 부여됩니다. 바이너리를 빌드한 뒤
+기존 기기의 환경에서 유효 시간이 짧은 일회용 등록 토큰을 만드세요.
+
+```bash
+make build
+
+export SYNC_SERVER_ADDRESS=127.0.0.1:8443
+export SYNC_FOLDER_ID=681f7dd7-559b-4fab-8734-41b00f663425
+export SYNC_DEVICE_TOKEN='existing-device-token'
+export ALLOW_INSECURE=true
+
+./bin/sync-agent enrollment create --role writer --expires 15m
+```
+
+응답의 `enrollment_token`만 새 기기로 안전하게 전달합니다. 토큰이 프로세스
+목록에 노출되지 않도록 환경 변수로 등록하세요.
+
+```bash
+export SYNC_SERVER_ADDRESS=server.example.com:8443
+export SYNC_ENROLLMENT_TOKEN='one-time-enrollment-token'
+
+./bin/sync-agent enroll --name laptop --platform linux/amd64
+```
+
+명령은 새 `device_id`, `device_token`, `folder_id`를 JSON으로 반환합니다.
+기기 토큰은 Secret Manager에 보관하고 에이전트 시작 전에
+`SYNC_DEVICE_TOKEN`과 `SYNC_FOLDER_ID`로 설정하세요. 등록 토큰은 SHA-256
+digest로만 저장되고 자동 만료되며 한 번만 사용할 수 있습니다. 기기 Bearer
+토큰도 digest만 저장합니다.
+
+역할별 권한:
+
+- `reader`: 백업 쓰기 없이 복원과 다운로드만 허용합니다.
+- `writer`: 읽기, 복원, 백업 쓰기를 허용합니다.
+- `restore-admin`: writer 권한에 더해 등록 토큰 발급과 보존 정책 관리를
+  허용합니다.
+
+### 폴더 복원
+
+복원할 때 서버는 선택한 폴더 sequence의 영속 작업과 immutable manifest를
+생성합니다. 클라이언트는 각 객체의 SHA-256과 크기를 확인한 뒤 atomic
+rename으로 게시하고, portable mode와 mtime을 복원하며 서버 버전을 로컬
+SQLite 상태 DB에 기록합니다.
+
+```bash
+# 최신 서버 sequence를 빈 디렉터리에 복원합니다.
+./bin/sync-agent restore --target /srv/recovered-project
+
+# 지정한 과거 sequence를 복원합니다.
+./bin/sync-agent restore --target /srv/recovered-project --sequence 420
+
+# 기존 일반 파일 교체를 명시적으로 허용합니다.
+./bin/sync-agent restore --target /srv/recovered-project --overwrite
+
+# 작업 생성 시 출력된 ID로 중단된 복원을 이어갑니다.
+./bin/sync-agent restore \
+  --target /srv/recovered-project \
+  --resume 2f32b0c2-1cef-4c58-aeca-70124c01372e
+```
+
+`--overwrite`가 없으면 내용이 다른 기존 파일은 skipped로 기록합니다.
+디렉터리, 심볼릭 링크, 기타 일반 파일이 아닌 경로는 교체하지 않습니다.
+manifest에 없는 파일도 삭제하지 않습니다. 에이전트가 감시 중인 루트에
+복원하려면 먼저 해당 에이전트를 중지하세요. 폴더의 보존 가능한 복원
+sequence보다 오래된 요청은 불완전한 manifest를 만들지 않고 거부합니다.
+
+### 안전 유예와 Garbage Collection
+
+각 폴더의 초기 안전 유예는 30일이고 2단계 삭제 유예는 24시간입니다. 복원
+관리자는 두 값을 조회하거나 변경할 수 있습니다.
+
+```bash
+./bin/sync-agent policy get
+
+./bin/sync-agent policy set \
+  --safety-window 720h \
+  --gc-grace-period 24h
+```
+
+Collector는 다음 조건을 모두 충족한 이전 non-head 버전만 정리합니다.
+
+- 이전 버전으로 대체된 뒤 폴더의 안전 유예가 모두 지났습니다.
+- 모든 활성 reader 기기가 해당 sequence 이상을 확인했습니다.
+- 활성 복원 작업과 고정된 snapshot이 해당 버전을 사용하지 않습니다.
+- 다른 버전이나 진행 중 작업이 객체를 참조하지 않습니다.
+
+참조가 사라진 객체는 먼저 `PENDING_DELETE`가 됩니다. 폴더의 GC 유예 종료 후
+참조를 다시 확인한 경우에만 Blob을 삭제합니다. 만료된 업로드 세션과 예약
+용량도 함께 회수하며, 임시 파일 정리가 실패하면 완료 처리 전까지 다시
+시도합니다. `GC_ENABLED`, `GC_INTERVAL`, `GC_BATCH_SIZE`로
+제한된 백그라운드 Collector를 제어합니다.
+
 ### 실행 설정
 
 Docker 설정 변수:
@@ -624,8 +818,8 @@ Docker 설정 변수:
 | --- | --- | --- | --- |
 | `DATABASE_URL` | 필수 | — | PostgreSQL 연결 문자열 |
 | `BLOB_ROOT` | 필수 | — | 불변 로컬 Blob Store 루트 |
-| `SYNC_DEVICE_ID` | 필수 | — | 허용된 기기 UUID |
-| `SYNC_DEVICE_TOKEN` | 필수 | — | 32자 이상의 기기 Bearer 토큰 |
+| `SYNC_DEVICE_ID` | bootstrap 또는 credential 갱신 시 | — | 설정할 기기 UUID |
+| `SYNC_DEVICE_TOKEN` | bootstrap 또는 credential 갱신 시 | — | 32자 이상의 기기 Bearer 토큰 |
 | `LISTEN_ADDR` | 선택 | `:8443` | gRPC 수신 주소 |
 | `TLS_CERT_FILE` | 운영 필수 | — | TLS 인증서 체인 |
 | `TLS_KEY_FILE` | 운영 필수 | — | TLS 개인 키 |
@@ -633,6 +827,9 @@ Docker 설정 변수:
 | `DEV_BOOTSTRAP` | 선택 | `false` | 개발용 사용자·기기·폴더 생성 |
 | `SYNC_USER_ID` | bootstrap 시 | — | 개발 사용자 UUID |
 | `SYNC_FOLDER_ID` | bootstrap 시 | — | 개발 폴더 UUID |
+| `GC_ENABLED` | 선택 | `true` | 수명 주기 Garbage Collection 실행 |
+| `GC_INTERVAL` | 선택 | `1h` | 정리 실행 주기 |
+| `GC_BATCH_SIZE` | 선택 | `100` | 단계별 최대 처리 건수, 최대 1000 |
 
 서버는 `MAX_FILE_SIZE_BYTES`, `MAX_FOLDER_LIVE_SIZE_BYTES`,
 `MAX_USER_LIVE_SIZE_BYTES`, `MAX_PENDING_UPLOAD_SIZE_BYTES`,
@@ -644,6 +841,7 @@ Docker 설정 변수:
 | --- | --- | --- | --- |
 | `SYNC_FOLDER_ID` | 필수 | — | 서버에서 허용한 폴더 UUID |
 | `SYNC_DEVICE_TOKEN` | 필수 | — | 32자 이상의 기기 Bearer 토큰 |
+| `SYNC_ENROLLMENT_TOKEN` | 기기 등록 시 | — | `sync-agent enroll`이 소비할 일회용 토큰 |
 | `SYNC_ROOT` | 선택 | — | 명시적 루트, 탐지 생략 |
 | `SYNC_WORKTREE` | 비대화형 탐지 시 | — | 탐지 ID 또는 절대 경로 |
 | `SYNC_WORKTREE_PROVIDERS` | 선택 | `all` | 제공자 필터 |

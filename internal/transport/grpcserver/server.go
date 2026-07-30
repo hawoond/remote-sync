@@ -164,7 +164,8 @@ func (s *Server) Download(
 	request *syncv1.DownloadRequest,
 	stream grpc.ServerStreamingServer[syncv1.DownloadChunk],
 ) error {
-	if _, err := s.resolver.Resolve(stream.Context()); err != nil {
+	deviceID, err := s.resolver.Resolve(stream.Context())
+	if err != nil {
 		return toStatus(err)
 	}
 	if request.GetOffset() < 0 {
@@ -174,7 +175,12 @@ func (s *Server) Download(
 	if err != nil {
 		return toStatus(err)
 	}
-	file, err := s.engine.OpenObject(stream.Context(), hash)
+	file, err := s.engine.OpenObjectForDevice(
+		stream.Context(),
+		deviceID,
+		request.GetFolderId(),
+		hash,
+	)
 	if err != nil {
 		return toStatus(err)
 	}
@@ -325,6 +331,10 @@ func toStatus(err error) error {
 		code, reason, message = codes.FailedPrecondition, "UPLOAD_NOT_VERIFIED", "upload not verified"
 	case errors.Is(err, metadata.ErrSessionExpired):
 		code, reason, message = codes.FailedPrecondition, "UPLOAD_SESSION_EXPIRED", "upload session expired"
+	case errors.Is(err, metadata.ErrEnrollmentExpired):
+		code, reason, message = codes.FailedPrecondition, "ENROLLMENT_UNAVAILABLE", "enrollment token expired or unavailable"
+	case errors.Is(err, metadata.ErrRestoreIncomplete):
+		code, reason, message = codes.FailedPrecondition, "RESTORE_INCOMPLETE", "restore has incomplete items"
 	case errors.Is(err, metadata.ErrNotFound), errors.Is(err, blob.ErrObjectNotFound):
 		code, reason, message = codes.NotFound, "NOT_FOUND", "resource not found"
 	case errors.Is(err, metadata.ErrQuotaExceeded), errors.Is(err, syncengine.ErrFileTooLarge):

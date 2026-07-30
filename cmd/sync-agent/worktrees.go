@@ -152,6 +152,12 @@ func writeAgentUsage(output io.Writer) {
 	_, _ = fmt.Fprintln(output, `Usage:
   sync-agent
   sync-agent discover [--provider all|codex|claude] [--json]
+  sync-agent enrollment create [--role reader|writer|restore-admin] [--expires 15m]
+  sync-agent enroll [--name NAME] [--platform PLATFORM]
+  sync-agent policy get
+  sync-agent policy set [--safety-window DURATION] [--gc-grace-period DURATION]
+  sync-agent restore --target PATH [--sequence NUMBER] [--overwrite]
+  sync-agent restore --target PATH --resume RESTORE_ID
 
 When SYNC_ROOT is unset, sync-agent discovers Codex and Claude Git worktrees
 and requires a user selection. Set SYNC_WORKTREE to a listed ID or absolute

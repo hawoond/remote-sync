@@ -12,6 +12,22 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: remote_sync
+          POSTGRES_USER: remote_sync
+          POSTGRES_PASSWORD: test-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U remote_sync -d remote_sync"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      TEST_DATABASE_URL: postgres://remote_sync:test-only-password@127.0.0.1:5432/remote_sync?sslmode=disable
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-go@v7.0.0
@@ -19,7 +35,7 @@ jobs:
           go-version-file: go.mod
           cache: true
       - name: Test
-        run: go test -race ./...
+        run: go test -race -p 1 ./...
       - name: Vet
         run: go vet ./...
       - name: Build

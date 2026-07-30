@@ -47,25 +47,41 @@ func realMain(arguments []string, input *os.File, output, errorOutput io.Writer)
 	defer cancel()
 
 	if len(arguments) > 0 {
+		var commandErr error
 		switch arguments[0] {
 		case "discover":
-			err := runDiscoverCommand(ctx, arguments[1:], output, errorOutput)
-			if errors.Is(err, flag.ErrHelp) {
-				return 0
+			commandErr = runDiscoverCommand(ctx, arguments[1:], output, errorOutput)
+		case "enrollment":
+			if len(arguments) < 2 || arguments[1] != "create" {
+				commandErr = errors.New("enrollment requires create")
+			} else {
+				commandErr = runEnrollmentCreateCommand(
+					ctx,
+					arguments[2:],
+					output,
+					errorOutput,
+				)
 			}
-			if err != nil {
-				_, _ = fmt.Fprintln(errorOutput, "sync-agent:", err)
-				return 2
-			}
-			return 0
+		case "enroll":
+			commandErr = runEnrollCommand(ctx, arguments[1:], output, errorOutput)
+		case "policy":
+			commandErr = runPolicyCommand(ctx, arguments[1:], output, errorOutput)
+		case "restore":
+			commandErr = runRestoreCommand(ctx, arguments[1:], output, errorOutput)
 		case "help", "-h", "--help":
 			writeAgentUsage(output)
 			return 0
 		default:
-			_, _ = fmt.Fprintf(errorOutput, "sync-agent: unknown command %q\n", arguments[0])
-			writeAgentUsage(errorOutput)
+			commandErr = fmt.Errorf("unknown command %q", arguments[0])
+		}
+		if errors.Is(commandErr, flag.ErrHelp) {
+			return 0
+		}
+		if commandErr != nil {
+			_, _ = fmt.Fprintln(errorOutput, "sync-agent:", commandErr)
 			return 2
 		}
+		return 0
 	}
 
 	rootPath, err := resolveSyncRoot(ctx, input, errorOutput)

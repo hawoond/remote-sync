@@ -15,6 +15,14 @@ service SyncService {
   rpc Download(DownloadRequest) returns (stream DownloadChunk);
   rpc ListChanges(ListChangesRequest) returns (ListChangesResponse);
   rpc AckChanges(AckChangesRequest) returns (google.protobuf.Empty);
+  rpc CreateEnrollment(CreateEnrollmentRequest) returns (CreateEnrollmentResponse);
+  rpc EnrollDevice(EnrollDeviceRequest) returns (EnrollDeviceResponse);
+  rpc GetFolderPolicy(GetFolderPolicyRequest) returns (FolderPolicy);
+  rpc UpdateFolderPolicy(UpdateFolderPolicyRequest) returns (FolderPolicy);
+  rpc StartRestore(StartRestoreRequest) returns (RestoreJob);
+  rpc ListRestoreItems(ListRestoreItemsRequest) returns (ListRestoreItemsResponse);
+  rpc ReportRestoreItem(ReportRestoreItemRequest) returns (RestoreJob);
+  rpc FinishRestore(FinishRestoreRequest) returns (RestoreJob);
 }
 
 enum ChangeKind {
@@ -37,6 +45,29 @@ enum CommitDisposition {
   COMMIT_DISPOSITION_IDEMPOTENT_REPLAY = 2;
   COMMIT_DISPOSITION_QUARANTINED = 3;
   COMMIT_DISPOSITION_CONFLICT_COPY = 4;
+}
+
+enum FolderRole {
+  FOLDER_ROLE_UNSPECIFIED = 0;
+  FOLDER_ROLE_READER = 1;
+  FOLDER_ROLE_WRITER = 2;
+  FOLDER_ROLE_RESTORE_ADMIN = 3;
+}
+
+enum RestoreState {
+  RESTORE_STATE_UNSPECIFIED = 0;
+  RESTORE_STATE_READY = 1;
+  RESTORE_STATE_RUNNING = 2;
+  RESTORE_STATE_COMPLETED = 3;
+  RESTORE_STATE_FAILED = 4;
+}
+
+enum RestoreItemState {
+  RESTORE_ITEM_STATE_UNSPECIFIED = 0;
+  RESTORE_ITEM_STATE_PENDING = 1;
+  RESTORE_ITEM_STATE_APPLIED = 2;
+  RESTORE_ITEM_STATE_SKIPPED = 3;
+  RESTORE_ITEM_STATE_FAILED = 4;
 }
 
 message BeginUploadRequest {
@@ -105,6 +136,7 @@ message ServerFrame {
 message DownloadRequest {
   bytes sha256 = 1;
   int64 offset = 2;
+  string folder_id = 3;
 }
 
 message DownloadChunk {
@@ -138,4 +170,110 @@ message ListChangesResponse {
 message AckChangesRequest {
   string folder_id = 1;
   int64 sequence = 2;
+}
+
+message CreateEnrollmentRequest {
+  string folder_id = 1;
+  FolderRole role = 2;
+  int64 expires_in_seconds = 3;
+}
+
+message CreateEnrollmentResponse {
+  string enrollment_id = 1;
+  string enrollment_token = 2;
+  string folder_id = 3;
+  FolderRole role = 4;
+  google.protobuf.Timestamp expires_at = 5;
+}
+
+message EnrollDeviceRequest {
+  string enrollment_token = 1;
+  string device_name = 2;
+  string platform = 3;
+  string capabilities_json = 4;
+}
+
+message EnrollDeviceResponse {
+  string device_id = 1;
+  string device_token = 2;
+  string folder_id = 3;
+  FolderRole role = 4;
+}
+
+message GetFolderPolicyRequest {
+  string folder_id = 1;
+}
+
+message UpdateFolderPolicyRequest {
+  string folder_id = 1;
+  int64 safety_window_seconds = 2;
+  int64 gc_grace_period_seconds = 3;
+}
+
+message FolderPolicy {
+  string folder_id = 1;
+  int64 safety_window_seconds = 2;
+  int64 gc_grace_period_seconds = 3;
+  int64 revision = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message StartRestoreRequest {
+  string folder_id = 1;
+  int64 snapshot_sequence = 2;
+  bool overwrite_existing = 3;
+}
+
+message RestoreJob {
+  string restore_id = 1;
+  string folder_id = 2;
+  string target_device_id = 3;
+  int64 snapshot_sequence = 4;
+  RestoreState state = 5;
+  bool overwrite_existing = 6;
+  int64 total_items = 7;
+  int64 applied_items = 8;
+  int64 skipped_items = 9;
+  int64 failed_items = 10;
+  string error_message = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp completed_at = 13;
+}
+
+message ListRestoreItemsRequest {
+  string restore_id = 1;
+  int64 after_ordinal = 2;
+  int32 limit = 3;
+}
+
+message RestoreItem {
+  int64 ordinal = 1;
+  string entry_id = 2;
+  string version_id = 3;
+  string path_key = 4;
+  string relative_path = 5;
+  bytes object_sha256 = 6;
+  int64 size = 7;
+  int64 mtime_unix_nano = 8;
+  uint32 portable_mode = 9;
+  RestoreItemState state = 10;
+  string error_message = 11;
+}
+
+message ListRestoreItemsResponse {
+  RestoreJob job = 1;
+  repeated RestoreItem items = 2;
+}
+
+message ReportRestoreItemRequest {
+  string restore_id = 1;
+  int64 ordinal = 2;
+  RestoreItemState state = 3;
+  string error_message = 4;
+}
+
+message FinishRestoreRequest {
+  string restore_id = 1;
+  bool success = 2;
+  string error_message = 3;
 }

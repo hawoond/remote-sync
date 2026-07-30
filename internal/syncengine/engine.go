@@ -30,6 +30,7 @@ type BlobStore interface {
 	Exists(context.Context, domain.Hash, int64) (bool, error)
 	Open(context.Context, domain.Hash) (*os.File, error)
 	Abort(context.Context, string) error
+	Delete(context.Context, domain.Hash) error
 }
 
 type Engine struct {

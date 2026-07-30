@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"syscall"
 
 	"github.com/google/uuid"
 	"github.com/hawoond/remote-sync/internal/domain"
@@ -222,6 +223,24 @@ func (s *Local) Abort(_ context.Context, sessionID string) error {
 		return fmt.Errorf("abort upload: %w", err)
 	}
 	return nil
+}
+
+func (s *Local) Delete(_ context.Context, hash domain.Hash) error {
+	name := objectName(hash)
+	if err := s.root.Remove(name); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("delete object: %w", err)
+	}
+	firstDirectory := path.Dir(name)
+	for firstDirectory != "objects/sha256" {
+		if err := s.root.Remove(firstDirectory); err != nil {
+			if errors.Is(err, os.ErrNotExist) || errors.Is(err, syscall.ENOTEMPTY) {
+				break
+			}
+			return fmt.Errorf("remove empty object directory: %w", err)
+		}
+		firstDirectory = path.Dir(firstDirectory)
+	}
+	return s.syncDirectory("objects")
 }
 
 func (s *Local) existingObject(name string, expected domain.Hash, size int64) (Object, bool, error) {

@@ -16,8 +16,8 @@ x-runtime-security: &runtime-security
 x-server-environment: &server-environment
   BLOB_ROOT: /var/lib/remote-sync/blobs
   LISTEN_ADDR: :8443
-  SYNC_DEVICE_ID: ${SYNC_DEVICE_ID:?Run ./scripts/init-env.sh first}
-  SYNC_DEVICE_TOKEN: ${SYNC_DEVICE_TOKEN:?Run ./scripts/init-env.sh first}
+  SYNC_DEVICE_ID: ${SYNC_DEVICE_ID:-}
+  SYNC_DEVICE_TOKEN: ${SYNC_DEVICE_TOKEN:-}
   ALLOW_INSECURE: ${ALLOW_INSECURE:-true}
   DEV_BOOTSTRAP: ${DEV_BOOTSTRAP:-true}
   SYNC_USER_ID: ${SYNC_USER_ID:-}
@@ -29,6 +29,9 @@ x-server-environment: &server-environment
   MAX_USER_LIVE_SIZE_BYTES: ${MAX_USER_LIVE_SIZE_BYTES:-1099511627776}
   MAX_PENDING_UPLOAD_SIZE_BYTES: ${MAX_PENDING_UPLOAD_SIZE_BYTES:-21474836480}
   MAX_CHUNK_SIZE_BYTES: ${MAX_CHUNK_SIZE_BYTES:-1048576}
+  GC_ENABLED: ${GC_ENABLED:-true}
+  GC_INTERVAL: ${GC_INTERVAL:-1h}
+  GC_BATCH_SIZE: ${GC_BATCH_SIZE:-100}
 
 services:
   postgres:
